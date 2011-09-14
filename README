@@ -1,1 +1,14 @@
-fer2net članarine
+Fer2net subscriptions app
+========================
+
+Instalation
+===========
+1) Copy config.properties-sample to config.properties and modify local settings.
+
+Running on dev server
+=====================
+Run:
+$ python manage.py runserver
+Open web browser and enter:
+  http://localhost:8000
+
