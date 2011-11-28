@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render_to_response
+from django.contrib.auth.decorators import login_required
+
+@login_required (redirect_field_name='index')
 
 def index(request):
   message = u"Hello world! ČĆŠĐŽ"
