@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render_to_response, redirect
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import login, logout
-from subscriptions.auth.backends import VBulletinBackend
+from django.contrib.auth import login, logout, authenticate
 from django.core.context_processors import csrf
 
 @login_required (redirect_field_name='index')
@@ -14,7 +13,7 @@ def loginview(request):
   if request.method == 'POST':
      username = request.POST['username']
      password = request.POST['password']
-     user = VBulletinBackend().authenticate(username = username, password = password)
+     user = authenticate(username = username, password = password)
      if user is not None:
        login(request, user)
      else:
@@ -27,4 +26,3 @@ def loginview(request):
 def logoutview(request):
   logout(request)
   return redirect("login")
-

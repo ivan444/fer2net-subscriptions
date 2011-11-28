@@ -16,6 +16,7 @@ class VBulletinBackend(ModelBackend):
         
         from django.db import connection
         cursor = connection.cursor()
+
         cursor.execute("""SELECT userid, username, password, salt, usergroupid, membergroupids
                           FROM %suser WHERE username = '%s'"""
                        % (VBULLETIN_CONFIG['tableprefix'], username))

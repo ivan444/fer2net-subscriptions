@@ -121,6 +121,8 @@ MIDDLEWARE_CLASSES = (
   'django.contrib.messages.middleware.MessageMiddleware',
 )
 
+AUTHENTICATION_BACKENDS = ('subscriptions.auth.backends.VBulletinBackend', )
+
 ROOT_URLCONF = 'urls'
 
 TEMPLATE_DIRS = (
