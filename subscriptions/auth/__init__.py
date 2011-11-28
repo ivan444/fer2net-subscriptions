@@ -1,12 +1,12 @@
 import logging
 logging.warning('Inside auth.__init__')
 
-from django.conf import settings
+import settings
 
 VBULLETIN_CONFIG = {
-    'tableprefix': '',
-    'superuser_groupids': (),
-    'staff_groupids': (),
+    'tableprefix': settings.cfgTablePrefix,
+    'superuser_groupids': settings.cfgSuGids,
+    'staff_groupids': settings.cfgStaffGids,
 }
 
 if hasattr(settings, 'VBULLETIN_CONFIG'):
