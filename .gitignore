@@ -4,3 +4,5 @@ config.properties
 admin/
 django.wsgi
 
+vim.session
+
