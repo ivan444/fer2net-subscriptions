@@ -16,6 +16,7 @@ cfgDebug = cfg.get("webconfig", "debug")
 cfgAdminName = cfg.get("webconfig", "admin_name")
 cfgAdminEmail = cfg.get("webconfig", "admin_email")
 
+
 DEBUG = cfgDebug.lower() == "true"
 TEMPLATE_DEBUG = DEBUG
 
@@ -35,6 +36,8 @@ DATABASES = {
     'PORT': dbPort,                      # Set to empty string for default. Not used with sqlite3.
   }
 }
+
+LOGIN_URL = "login"
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
