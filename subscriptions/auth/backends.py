@@ -4,7 +4,7 @@ import md5
 from django.contrib.auth.models import User
 from django.contrib.auth.backends import ModelBackend
 
-from vbulletin.auth import VBULLETIN_CONFIG
+from subscriptions.auth import VBULLETIN_CONFIG
 
 class VBulletinBackend(ModelBackend):
     """
