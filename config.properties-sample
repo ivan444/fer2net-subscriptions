@@ -1,11 +1,14 @@
 [webconfig]
-# web database connection configuration
-engine=sqlite3
-name=
-user=
-password=
-host= 
+engine=mysql
+name=vbforum
+user=root
+password=qwertz
+host=
 port=
 debug=True
-admin_name=Ivan444
-admin_email=ivan.kristo@gmail.com
+admin_name=admin
+admin_email=admin@mailinator.com
+tableprefix=
+superuser_groupids=6
+staff_groupids=5,7
+
