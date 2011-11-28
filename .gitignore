@@ -5,4 +5,5 @@ admin/
 django.wsgi
 
 vim.session
+*.swp
 
