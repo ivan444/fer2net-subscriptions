@@ -9,5 +9,5 @@ VBULLETIN_CONFIG = {
     'staff_groupids': settings.cfgStaffGids,
 }
 
-if hasattr(settings, 'VBULLETIN_CONFIG'):
-    VBULLETIN_CONFIG.update(settings.VBULLETIN_CONFIG)
+#if hasattr(settings, 'VBULLETIN_CONFIG'):
+#    VBULLETIN_CONFIG.update(settings.VBULLETIN_CONFIG)
