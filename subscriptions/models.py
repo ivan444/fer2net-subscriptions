@@ -11,6 +11,9 @@ class Subscription(models.Model):
   # payment amount
   amount = models.IntegerField()
 
+  # payment is delayed but subscription is active
+  delayed = models.BooleanField()
+
   # date of payment
   date = models.DateTimeField()
 
@@ -30,5 +33,5 @@ class Subscription(models.Model):
 
   # if null: this subscription record is valid
   # if not null: subscription record was modified, child points to edited version of record
-  child = models.OneToOneField(Subscription, null=True, related_name="parent")
+  child = models.OneToOneField('self', null=True, related_name="parent")
 
