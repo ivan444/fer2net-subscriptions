@@ -13,6 +13,7 @@ urlpatterns = patterns('',
   url(r'^site_media/(?P<path>[a-zA-Z\-\._0-9]+)$', 'django.views.static.serve', {'document_root': settings.SITE_ROOT + '/templates/'}, name="templates"),
   url(r'^site_media/images/(?P<path>[a-zA-Z\-\._0-9]+)$', 'django.views.static.serve', {'document_root': settings.SITE_ROOT + '/templates/images'}, name="images"),
   url(r'^site_media/js/(?P<path>[a-zA-Z\-\._0-9]+)$', 'django.views.static.serve', {'document_root': settings.SITE_ROOT + '/templates/js'}, name="js"),
+  url (r'^favication.ico$', 'django.views.static.serve', { 'document_root': settings.SITE_ROOT + '/templates/'}, name="favication"),
   url(r'^.*$', 'subscriptions.views.index', name='index'),
 )
 
