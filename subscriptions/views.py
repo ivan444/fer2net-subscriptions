@@ -9,10 +9,6 @@ def index(request):
   message = u"Hello world! ČĆŠĐŽ"
   return render_to_response('index.html', {'message': message})
 
-@login_required
-def drugi(request):
-  return render_to_response('index.html', {'message': "drugi"})
-
 def loginview(request):
   # c is dictionary used to send data to template
   c = { 'next': 'index',          # Where to go after the login, default

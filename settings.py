@@ -123,6 +123,9 @@ MIDDLEWARE_CLASSES = (
 
 AUTHENTICATION_BACKENDS = ('subscriptions.auth.backends.VBulletinBackend', )
 
+AUTH_PROFILE_MODULE = 'subscriptions.UserProfile'
+
+
 ROOT_URLCONF = 'urls'
 
 TEMPLATE_DIRS = (
