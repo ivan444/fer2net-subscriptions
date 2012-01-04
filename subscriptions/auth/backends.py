@@ -13,23 +13,24 @@ class VBulletinBackend(ModelBackend):
     
     def authenticate(self, username=None, password=None):
         logging.debug('Using VBulletinBackend')
+        email = username
         
         from django.db import connection
         cursor = connection.cursor()
 
-        cursor.execute("""SELECT userid, username, password, salt, usergroupid, membergroupids
-                          FROM %suser WHERE username = '%s'"""
-                       % (VBULLETIN_CONFIG['tableprefix'], username))
+        cursor.execute("""SELECT userid, username, password, salt, usergroupid, membergroupids, email
+                          FROM %suser WHERE email = '%s'"""
+                       % (VBULLETIN_CONFIG['tableprefix'], email))
         row = cursor.fetchone()
         
         hashed = md5.new(md5.new(password).hexdigest() + row[3]).hexdigest()
         
         if row[2] == hashed:
             try:
-                user = User.objects.get(username=username)
+                user = User.objects.get(email=email)
             except User.DoesNotExist:
-                user = User(username=username)
-                
+                user = User(id=int(row[0]), username=row[1], email=email)
+
                 user.is_staff = False
                 user.is_superuser = False
 
@@ -52,3 +53,4 @@ class VBulletinBackend(ModelBackend):
             return user
             
         return None
+
