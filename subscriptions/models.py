@@ -27,7 +27,6 @@ class Subscription(models.Model):
   )
   paymentType = models.CharField(max_length=1, choices=PAYMENT_CHOICES)
 
-
   # who has received payment (admin for eBanking)
   paymaster = models.ForeignKey(User, unique=False, null=False, related_name="processed_payments")
 

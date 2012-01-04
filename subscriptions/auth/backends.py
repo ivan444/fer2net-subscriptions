@@ -25,11 +25,12 @@ class VBulletinBackend(ModelBackend):
         
         hashed = md5.new(md5.new(password).hexdigest() + row[3]).hexdigest()
         
+        id = int(row[0])
         if row[2] == hashed:
             try:
-                user = User.objects.get(email=email)
+                user = User.objects.get(id=id)
             except User.DoesNotExist:
-                user = User(id=int(row[0]), username=row[1], email=email)
+                user = User(id=id, username=row[1], email=email)
 
                 user.is_staff = False
                 user.is_superuser = False
