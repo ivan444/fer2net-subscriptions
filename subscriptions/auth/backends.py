@@ -10,7 +10,8 @@ class VBulletinBackend(ModelBackend):
     """
     We override ModelBackend to make use of django.contrib.auth permissions
     """
-    
+
+    # TODO: close cursor??
     def authenticate(self, username=None, password=None):
         logging.debug('Using VBulletinBackend')
         email = username

@@ -7,6 +7,8 @@ admin.autodiscover()
 urlpatterns = patterns('',
   url(r'^index$', 'subscriptions.views.index', name='index'),
   url(r'^$', 'subscriptions.views.index', name='index'),
+  url(r'^payment/make$', 'subscriptions.views.makePayment', name='make_payment'),
+  url(r'^payment/make/(?P<uid>[\d ]+)/(?P<amount>\d+)$', 'subscriptions.views.makePayment', name='make_payment'),
   url(r'^login$', 'subscriptions.views.loginview', name='loginview'),
   url(r'^logout$', 'subscriptions.views.logoutview', name='logout'),
   url(r'^admin/', include(admin.site.urls)),

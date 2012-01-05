@@ -17,6 +17,25 @@
     <script src="{% url js "jquery.js" %}" type="text/javascript"></script>	
     <script src="{% url js "jquery.dataTables.min.js" %}" type="text/javascript"></script>	
     <script type="text/javascript" src="{% url js "f2net-subs.js" %}"></script>
+
+  <script type="text/javascript">
+
+    function makePayment(uid, amount) {
+      $.ajax({
+        url: '{% url make_payment %}/'+uid+'/'+amount,
+        success: function(data) {
+          confirmPayment(uid);
+        }
+      });
+    }
+
+    function confirmPayment(uid) {
+      alert('Done! ' + uid);
+      $('#paymentBtn_'+uid).disabled = true;
+    }
+
+  </script>
+	<!-- End JS -->
     
   </head>
 
@@ -33,7 +52,9 @@
   <noscript>
     <div style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
       Your web browser must have JavaScript enabled
-      in order for this application to display correctly.
+      in order for this application to dis
+      
+lay correctly.
     </div>
   </noscript>
 
@@ -65,8 +86,8 @@
           <td>{{ u.userid }}</td>
           <td>{{ u.username }}</td>
           <td>{{ u.email }}</td>
-          <td><input id="q{{ u.userid|cut:" " }}" type="text" size="4" value="none" /></td>
-          <td><input type="button" value="Ubaci" onclick="addCartItem('{{ u.userid }}', $('#q{{ u.userid|cut:" " }}').val())" /></td>
+          <td><input id="amount_{{ u.userid }}" type="text" size="4" value="10" /></td>
+          <td><input id="paymentBtn_{{ u.userid }}" type="button" value="Uplati" onclick="makePayment('{{ u.userid }}', $('#amount_{{ u.userid }}').val())" /></td>
         </tr>
       {% endfor %}
     </tbody>
