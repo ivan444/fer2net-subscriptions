@@ -10,6 +10,7 @@ import logging
 import md5
 from django.db import connection
 from subscriptions.auth import VBULLETIN_CONFIG
+from subscriptions.models import Subscription
 
 @login_required 
 def index(request):
@@ -40,20 +41,19 @@ def indexStaff(request):
 @login_required 
 def makePayment(request, uid=None, amount=None):
   if uid==None or amount==None: return Http404("no params")
-  #if not (request.user.is_staff or request.user.is_superuser):
-  #  return HttpResponse("", status=403)
+  if not (request.user.is_staff or request.user.is_superuser):
+    return HttpResponse("user is not staff member!", status=403)
 
   user = fetchUser(uid)
   sub = Subscription(user=user, amount=int(amount), delayed=False)
   sub.paymaster = request.user
   sub.paymentType = 'P'
   sub.date = datetime.now()
-  sub.subsEnd =sub.date + timedelta(days=365)
+  sub.subsEnd = sub.date + timedelta(days=365)
   sub.save()
-  
-  request.session.modified = True
-  return HttpResponse("{\"status\":\"ok\"}", mimetype='application/javascript; charset=utf8')
 
+  request.session.modified = True
+  return HttpResponse('{status:"ok"}', mimetype='application/javascript; charset=utf8')
 
 #TODO: close cursor
 def fetchUser(uid):
@@ -101,26 +101,25 @@ def loginview(request):
         'wrong_login': False }    # Did user provided us wrong data?
 
   if 'next' in request.GET: 
-     c['next'] = request.GET['next'] 
+    c['next'] = request.GET['next'] 
 
-  
   # generating anti-CSRF key
-  c.update(csrf(request))         
+  c.update(csrf(request))
  
   if request.method == 'POST':
-     username = request.POST['username']
-     password = request.POST['password']
+    username = request.POST['username']
+    password = request.POST['password']
 
      # in case this is wrong login, site should still remember where to go next
-     c['next'] = request.POST['next'] 
-
-     user = authenticate(username = username, password = password)
-     if user is not None:
-       login(request, user)
-       return redirect (c['next'])
-     else:
-       c['wrong_login'] = True
-        
+    c['next'] = request.POST['next'] 
+    
+    user = authenticate(username = username, password = password)
+    if user is not None:
+      login(request, user)
+      return redirect (c['next'])
+    else:
+      c['wrong_login'] = True
+   
   # show the form 
   return render_to_response('login.html', c)
 

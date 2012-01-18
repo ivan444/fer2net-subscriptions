@@ -20,18 +20,21 @@
 
   <script type="text/javascript">
 
+    function confirmPayment(uid) {
+      alert('Done! ' + uid);
+      $('#paymentBtn_'+uid).attr("disabled", "true");
+    }
+
     function makePayment(uid, amount) {
       $.ajax({
         url: '{% url make_payment %}/'+uid+'/'+amount,
+        error: function(jqXHR, textStatus, errorThrown) {
+          alert("Error!\n" + jqXHR + "\n" + textStatus + "\n" + errorThrown); // TODO: humanize error
+        },
         success: function(data) {
           confirmPayment(uid);
         }
       });
-    }
-
-    function confirmPayment(uid) {
-      alert('Done! ' + uid);
-      $('#paymentBtn_'+uid).disabled = true;
     }
 
   </script>

@@ -24,6 +24,8 @@ class VBulletinBackend(ModelBackend):
                        % (VBULLETIN_CONFIG['tableprefix'], email))
         row = cursor.fetchone()
         
+        print str(row[4]), str(VBULLETIN_CONFIG['superuser_groupids']), str(str(row[4]) in VBULLETIN_CONFIG['superuser_groupids'])
+        
         hashed = md5.new(md5.new(password).hexdigest() + row[3]).hexdigest()
         
         id = int(row[0])
@@ -37,17 +39,17 @@ class VBulletinBackend(ModelBackend):
                 user.is_superuser = False
 
                 # Process primary usergroup
-                if row[4] in VBULLETIN_CONFIG['superuser_groupids']:
+                if str(row[4]) in VBULLETIN_CONFIG['superuser_groupids']:
                     user.is_staff = True    
                     user.is_superuser = True
-                elif row[4] in VBULLETIN_CONFIG['staff_groupids']:
+                elif str(row[4]) in VBULLETIN_CONFIG['staff_groupids']:
                     user.is_staff = True
                 
-                # Process addtional usergroups
+                # Process additional usergroups
                 for groupid in row[5].split(','):
-                    if groupid in VBULLETIN_CONFIG['superuser_groupids']:
+                    if str(groupid) in VBULLETIN_CONFIG['superuser_groupids']:
                         user.is_superuser = True
-                    if groupid in VBULLETIN_CONFIG['staff_groupids']:
+                    if str(groupid) in VBULLETIN_CONFIG['staff_groupids']:
                         user.is_staff = True
                 
                 user.set_unusable_password()
