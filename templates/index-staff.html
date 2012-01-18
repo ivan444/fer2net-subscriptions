@@ -23,6 +23,7 @@
     function confirmPayment(uid) {
       alert('Done! ' + uid);
       $('#paymentBtn_'+uid).attr("disabled", "true");
+      $('#expr_days_'+uid).val("365");
     }
 
     function makePayment(uid, amount) {
@@ -77,6 +78,7 @@ lay correctly.
     <thead>
       <tr>
         <td>UserID</td>
+        <td>Do isteka [dana]</td>
         <td>Username</td>
         <td>Iznos</td>
         <td>&nbsp;</td>
@@ -87,6 +89,7 @@ lay correctly.
       {% for u in allUsers %}
         <tr>
           <td>{{ u.userid }}</td>
+          <td id="expr_days_{{ u.userid }}">{{ u.sub_expr }}</td>
           <td>{{ u.username }}</td>
           <td>{{ u.email }}</td>
           <td><input id="amount_{{ u.userid }}" type="text" size="4" value="10" /></td>

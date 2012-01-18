@@ -33,6 +33,13 @@ def indexStaff(request):
     usr["userid"] = r[0]
     usr["username"] = r[1]
     usr["email"] = r[2]
+    subs = Subscription.objects.filter(user__id = int(r[0])).order_by('-date').all()
+    if len(subs) == 0:
+      usr["sub_expr"] = -365
+    else:
+      td = datetime.now() - subs[0].date
+      usr["sub_expr"] = max(-365, 365-td.days)
+
     allUsers.append(usr)
 
   return render_to_response('index-staff.html', {'allUsers': allUsers})
