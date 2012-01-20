@@ -1,4 +1,3 @@
-<!doctype html>
 <!-- The DOCTYPE declaration above will set the    -->
 <!-- browser's rendering engine into               -->
 <!-- "Standards Mode". Replacing this declaration  -->
@@ -9,23 +8,123 @@
   <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <link type="text/css" rel="stylesheet" href="{% url templates "f2net-subs.css" %}">
+    <link type="text/css" rel="stylesheet" href="{% url templates "demo_page.css" %}">
+    <link type="text/css" rel="stylesheet" href="{% url templates "demo_table.css" %}">
+    <link type="text/css" rel="stylesheet" href="{% url templates "demo_table_jui.css" %}">
+    <link type="text/css" rel="stylesheet" href="{% url templates "jquery.ui.all.css" %}">
+    <link type="text/css" rel="stylesheet" href="{% url templates "jquery.ui.base.css" %}">
+    <link type="text/css" rel="stylesheet" href="{% url templates "jquery.ui.core.css" %}">
+    <link type="text/css" rel="stylesheet" href="{% url templates "jquery.ui.datepicker.css" %}">
     <title>Fer2Net članarine</title>
 
     <!--script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script-->
     <script src="{% url js "jquery.js" %}" type="text/javascript"></script>	
+    <script src="{% url js "jquery.dataTables.min.js" %}" type="text/javascript"></script>	
+    <script src="{% url js "jquery.ui.core.js" %}" type="text/javascript"></script>	
+    <script src="{% url js "jquery.ui.widget.js" %}" type="text/javascript"></script>	
+    <script src="{% url js "jquery.ui.datepicker.js" %}" type="text/javascript"></script>	
     <script type="text/javascript" src="{% url js "f2net-subs.js" %}"></script>
+
+	<!-- End JS -->
     
   </head>
 
 <body>
+<script type="text/javascript">
+{% block start-scripts %}
+  $(document).ready(function() {
+    $('#subs').dataTable();
+    $('#bills').dataTable();
+    $(".datePicker").datepicker();
+  });
+{% endblock %}
+</script>
     
-  <img src="{% url images "knob_message.png" %}" />
-  <h2>{{ username }}</h2>
-  <ul>
-    {% for s in subs %}
-    <li>{{ s.date }} {{ s.subsEnd }} {{ s.paymaster.username }}</li>
-    {% endfor %}
-  </ul>
+  <!-- web app will not function without JavaScript enabled -->
+  <noscript>
+    <div style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
+      Your web browser must have JavaScript enabled
+      in order for this application to display correctly.
+    </div>
+  </noscript>
+
+  {% if msg_info %}
+    <div class="info">{{ msg_info }}</div>
+  {% endif %}
+
+  {% if msg_warning %}
+    <div class="warning">{{ msg_warning }}</div>
+  {% endif %}
+
+  {% if msg_success %}
+    <div class="success">{{ msg_success }}</div>
+  {% endif %}
+
+  <h1>Hello {{ username }}!</h2>
+  <a href="{% url staff %}">Staff page</a>
+  <a href="{% url member %}">Member page</a>
+
+  <table id="subs" cellpadding="0" cellspacing="0" border="0" class="display">
+    <thead>
+      <tr>
+        <td>UserID</td>
+        <td>Username</td>
+        <td>Iznos</td>
+        <td>Valid</td>
+        <td>Do isteka</td>
+        <td>Paymaster</td>
+        <td>Datum</td>
+        <td>Način plaćanja</td>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in allSubs %}
+        <tr>
+          <td>{{ s.user.id }}</td>
+          <td>{{ s.user.username }}</td>
+          <td>{{ s.amount }}</td>
+          <td>{{ s.valid }}</td>
+          <td>{{ s.subsEnd|timeuntil }}</td>
+          <td>{{ s.paymaster.username }}</td>
+          <td>{{ s.date|date:"D d M Y" }}</td>
+          <td>{{ s.paymentType }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h2>Računi</h2>
+  <table id="bills" cellpadding="0" cellspacing="0" border="0" class="display">
+    <thead>
+      <tr>
+        <td>Tip</td>
+        <td>Iznos</td>
+        <td>Datum plaćanja</td>
+        <td>Traje do</td>
+        <td>Ak. god.</td>
+      </tr>
+    </thead>
+    <tbody>
+      {% for b in allBills %}
+        <tr>
+          <td>{{ b.billType }}</td>
+          <td>{{ b.amount }}</td>
+          <td>{{ b.date|date:"D d M Y" }}</td>
+          <td>{{ b.expirationDate|date:"D d M Y" }}</td>
+          <td>{{ b.academicYear }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+
+  <h3>Dodaj račun</h3>
+  <form name="add_bill_frm" action="{% url superuser %}" method="POST">
+    {% csrf_token %}
+    {{ bill_form }}
+    <input type="submit" value="Dodaj" />
+  </form>
+
   <a href="{% url logout %}">Logout</a>
 
   </body>

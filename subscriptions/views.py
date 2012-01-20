@@ -5,12 +5,13 @@ from django.contrib.auth import login, logout, authenticate
 from django.core.context_processors import csrf
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.models import User
+from django.template import RequestContext
 from datetime import datetime, timedelta
 import logging
 import md5
 from django.db import connection
 from subscriptions.auth import VBULLETIN_CONFIG
-from subscriptions.models import Subscription
+from subscriptions.models import Subscription, Bill, BillForm
 
 @login_required 
 def index(request):
@@ -20,7 +21,6 @@ def index(request):
     return indexStaff(request)
   else:
     return indexMember(request)
-
 
 @login_required 
 def indexMember(request):
@@ -33,8 +33,18 @@ def indexSuperuser(request):
   if not request.user.is_superuser:
     return HttpResponse("user is not superuser!", status=403)
 
-  subs = Subscription.objects.filter(user__id = request.user.id).order_by('-date').all()
-  return render_to_response('index-superuser.html', {'username': request.user.username, 'subs': subs})
+  if request.method == "POST":
+    form = BillForm(request.POST)
+    if form.is_valid():
+      bill = form.save()
+  else:
+    form = BillForm()
+
+  bills = Bill.objects.order_by('-date').all()
+
+
+  subs = Subscription.objects.order_by('-date').all()
+  return render_to_response('index-superuser.html', {'username': request.user.username, 'allSubs': subs, 'bill_form': form, 'allBills': bills}, context_instance=RequestContext(request))
 
 
 #TODO: close cursor
@@ -84,7 +94,15 @@ def makePayment(request, uid=None, amount=None):
   sub.save()
 
   request.session.modified = True
+
+  activateMember(user)
+
   return HttpResponse('{status:"ok"}', mimetype='application/javascript; charset=utf8')
+
+
+def activateMember(user):
+  """Aktiviranje korisnika."""
+  pass # TODO
 
 
 @login_required 
@@ -178,4 +196,15 @@ def loginview(request):
 def logoutview(request):
   logout(request)
   return redirect("loginview")
+
+
+@login_required
+def stats(request):
+ # TODO
+ # ukupno skupljeno po ak.godini,
+ # ukupan trošak u akademskoj godini,
+ # trenutno ukupno stanje f2 blagajne,
+ # uplaćeno uživo/int. bankarstvom,
+ # broj studenata koji je platio
+  return redirect("index")
 

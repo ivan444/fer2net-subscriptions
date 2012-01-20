@@ -6,7 +6,10 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
   url(r'^index$', 'subscriptions.views.index', name='index'),
-  url(r'^$', 'subscriptions.views.index', name='index'),
+  url(r'^staff$', 'subscriptions.views.indexStaff', name='staff'),
+  url(r'^superuser$', 'subscriptions.views.indexSuperuser', name='superuser'),
+  url(r'^member$', 'subscriptions.views.indexMember', name='member'),
+  url(r'^$', 'subscriptions.views.index', name='index-clean'),
   url(r'^payment/make$', 'subscriptions.views.makePayment', name='make_payment'),
   url(r'^payment/make/(?P<uid>[\d ]+)/(?P<amount>\d+)$', 'subscriptions.views.makePayment', name='make_payment'),
   url(r'^payment/delete$', 'subscriptions.views.deletePayment', name='delete_payment'),

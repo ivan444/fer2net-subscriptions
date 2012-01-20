@@ -1,9 +1,47 @@
+# -*- coding: utf-8 -*-
 from django.db import models
+from django.forms import ModelForm
 from django.contrib.auth.models import User
 
-class UserProfile(models.Model):
-  user = models.ForeignKey(User, unique=True)
+# Custom date widget for date field
+def makeCustomDatefield(f):
+  formfield = f.formfield()
+  if isinstance(f, models.DateField):
+    formfield.widget.format = '%m/%d/%Y'
+    formfield.widget.attrs.update({'class':'datePicker', 'readonly':'true'})
+  return formfield
 
+# Service bill (bill for hosting, licenses, etc.)
+class Bill(models.Model):
+  BILL_TYPES = (
+    ('H', 'forum hosting'),
+    ('M', 'materials hosting'),
+    ('F', 'forum licenses'),
+    ('W', 'windows licenses'),
+    ('D', 'domain'),
+    ('O', 'other expenses'),
+  )
+  billType = models.CharField(max_length=1, choices=BILL_TYPES)
+
+  # bill amount (size of bill)
+  amount = models.IntegerField()
+
+  # date of payment 
+  date = models.DateTimeField()
+
+  # date of expiration of service
+  expirationDate = models.DateTimeField()
+
+  # academic year in which this bill belongs to (format: "yyyy/yyyy", eg. "2006/2007")
+  academicYear = models.CharField(max_length=9)
+
+class BillForm(ModelForm):
+  # enable custom date widget
+  formfield_callback = makeCustomDatefield
+  class Meta:
+    model = Bill
+
+# User subscription
 class Subscription(models.Model):
   # user who paid for subscription
   user = models.ForeignKey(User, unique=False, null=False, related_name="subscriptions")
