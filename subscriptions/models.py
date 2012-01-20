@@ -12,7 +12,7 @@ class Subscription(models.Model):
   amount = models.IntegerField()
 
   # payment is delayed but subscription is active
-  delayed = models.BooleanField()
+  delayed = models.BooleanField(default=False)
 
   # date of payment
   date = models.DateTimeField()
@@ -30,7 +30,6 @@ class Subscription(models.Model):
   # who has received payment (admin for eBanking)
   paymaster = models.ForeignKey(User, unique=False, null=False, related_name="processed_payments")
 
-  # if null: this subscription record is valid
-  # if not null: subscription record was modified, child points to edited version of record
-  child = models.OneToOneField('self', null=True, related_name="parent")
+  # is record valid
+  valid = models.BooleanField(default=True)
 

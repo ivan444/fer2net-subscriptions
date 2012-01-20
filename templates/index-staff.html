@@ -23,7 +23,17 @@
     function confirmPayment(uid) {
       alert('Done! ' + uid);
       $('#paymentBtn_'+uid).attr("disabled", "true");
-      $('#expr_days_'+uid).val("365");
+      $('#delayBtn_'+uid).attr("disabled", "true");
+      $('#deleteBtn_'+uid).removeAttr("disabled");
+      $('#expr_days_'+uid).text("365");
+    }
+
+    function confirmDeletePayment(uid) {
+      alert('Done! ' + uid);
+      $('#paymentBtn_'+uid).removeAttr("disabled");
+      $('#delayBtn_'+uid).removeAttr("disabled");
+      $('#deleteBtn_'+uid).attr("disabled", "true");
+      $('#expr_days_'+uid).text("-");
     }
 
     function makePayment(uid, amount) {
@@ -38,6 +48,30 @@
       });
     }
 
+    function deletePayment(uid) {
+      $.ajax({
+        url: '{% url delete_payment %}/'+uid,
+        error: function(jqXHR, textStatus, errorThrown) {
+          alert("Error!\n" + jqXHR + "\n" + textStatus + "\n" + errorThrown); // TODO: humanize error
+        },
+        statusCode: {
+          404: function() {
+            alert('Uplata ne postoji ili nemate dopuštenje za brisanje uplate.');
+          }
+        },
+        success: function(data) {
+          confirmDeletePayment(uid);
+        }
+      });
+    }
+
+    function updateAmount() {
+      var amount = $("#def_amount_val").val();
+      $("[id^=amount_]").each(function (idx) {
+          $(this).val(amount);
+      });
+    }
+
   </script>
 	<!-- End JS -->
     
@@ -48,6 +82,7 @@
 {% block start-scripts %}
   $(document).ready(function() {
     $('#users').dataTable();
+    $('#def_amount_val').change(updateAmount);
   });
 {% endblock %}
 </script>
@@ -74,6 +109,7 @@ lay correctly.
     <div class="success">{{ msg_success }}</div>
   {% endif %}
 
+  <div id="def_amount">Default amount: <input id="def_amount_val" type="text" size="4" value="10" /></div>
   <table id="users" cellpadding="0" cellspacing="0" border="0" class="display">
     <thead>
       <tr>
@@ -81,6 +117,8 @@ lay correctly.
         <td>Do isteka [dana]</td>
         <td>Username</td>
         <td>Iznos</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
       </tr>
@@ -94,6 +132,8 @@ lay correctly.
           <td>{{ u.email }}</td>
           <td><input id="amount_{{ u.userid }}" type="text" size="4" value="10" /></td>
           <td><input id="paymentBtn_{{ u.userid }}" type="button" value="Uplati" onclick="makePayment('{{ u.userid }}', $('#amount_{{ u.userid }}').val())" /></td>
+          <td><input id="delayBtn_{{ u.userid }}" type="button" value="Odgoda" onclick="makePayment('{{ u.userid }}', '0')" /></td>
+          <td><input id="deleteBtn_{{ u.userid }}" disabled="true" type="button" value="Obriši" onclick="deletePayment('{{ u.userid }}')" /></td>
         </tr>
       {% endfor %}
     </tbody>

@@ -14,13 +14,35 @@ from subscriptions.models import Subscription
 
 @login_required 
 def index(request):
-  return indexStaff(request)
-  #message = u"Hello world! ČĆŠĐŽ"
-  #return render_to_response('index.html', {'message': message})
+  if request.user.is_superuser:
+    return indexSuperuser(request)
+  elif request.user.is_staff:
+    return indexStaff(request)
+  else:
+    return indexMember(request)
+
+
+@login_required 
+def indexMember(request):
+  subs = Subscription.objects.filter(user__id = request.user.id).order_by('-date').all()
+  return render_to_response('index-member.html', {'username': request.user.username, 'subs': subs})
+
+
+@login_required 
+def indexSuperuser(request):
+  if not request.user.is_superuser:
+    return HttpResponse("user is not superuser!", status=403)
+
+  subs = Subscription.objects.filter(user__id = request.user.id).order_by('-date').all()
+  return render_to_response('index-superuser.html', {'username': request.user.username, 'subs': subs})
+
 
 #TODO: close cursor
 @login_required 
 def indexStaff(request):
+  if not (request.user.is_staff or request.user.is_superuser):
+    return HttpResponse("user is not staff member!", status=403)
+
   cursor = connection.cursor()
 
   cursor.execute("""SELECT userid, username, email
@@ -52,7 +74,9 @@ def makePayment(request, uid=None, amount=None):
     return HttpResponse("user is not staff member!", status=403)
 
   user = fetchUser(uid)
-  sub = Subscription(user=user, amount=int(amount), delayed=False)
+  intAmount = int(amount)
+  sub = Subscription(user=user, amount=intAmount)
+  sub.delayed = intAmount == 0
   sub.paymaster = request.user
   sub.paymentType = 'P'
   sub.date = datetime.now()
@@ -61,6 +85,26 @@ def makePayment(request, uid=None, amount=None):
 
   request.session.modified = True
   return HttpResponse('{status:"ok"}', mimetype='application/javascript; charset=utf8')
+
+
+@login_required 
+def deletePayment(request, uid=None):
+  if uid==None: return Http404("no params")
+  if not (request.user.is_staff or request.user.is_superuser):
+    return HttpResponse("user is not staff member!", status=403)
+
+  user = fetchUser(uid)
+  nw = datetime.now()
+  ss = Subscription.objects.filter(user__id = int(uid)).filter(paymaster = request.user).filter(valid = True).filter(date__year = nw.year).filter(date__month = nw.month).filter(date__day = nw.day).order_by('-date').all()
+  request.session.modified = True
+  if len(ss) == 0:
+    return HttpResponse("there are no subscriptions to delete", status=404)
+  else:
+    sub = ss[0]
+    sub.valid = False
+    sub.save()
+    return HttpResponse('{status:"ok"}', mimetype='application/javascript; charset=utf8')
+
 
 #TODO: close cursor
 def fetchUser(uid):
@@ -129,6 +173,7 @@ def loginview(request):
    
   # show the form 
   return render_to_response('login.html', c)
+
 
 def logoutview(request):
   logout(request)
