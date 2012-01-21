@@ -9,9 +9,10 @@ from django.template import RequestContext
 from datetime import datetime, timedelta
 import logging
 import md5
+import xml.dom.minidom
 from django.db import connection
 from subscriptions.auth import VBULLETIN_CONFIG
-from subscriptions.models import Subscription, Bill, BillForm
+from subscriptions.models import Subscription, Bill, BillForm, EBankingUploadForm, EBankingSubForm
 
 @login_required 
 def index(request):
@@ -179,13 +180,13 @@ def loginview(request):
     username = request.POST['username']
     password = request.POST['password']
 
-     # in case this is wrong login, site should still remember where to go next
+    # in case this is wrong login, site should still remember where to go next
     c['next'] = request.POST['next'] 
     
     user = authenticate(username = username, password = password)
     if user is not None:
       login(request, user)
-      return redirect (c['next'])
+      return redirect(c['next'])
     else:
       c['wrong_login'] = True
    
@@ -207,4 +208,65 @@ def stats(request):
  # uplaćeno uživo/int. bankarstvom,
  # broj studenata koji je platio
   return redirect("index")
+
+
+def processUploadedPayments(xmlContents):
+  payments = []
+  doc = xml.dom.minidom.parseString(xmlContents)
+  trans = doc.getElementsByTagName("transactions")[0]
+  for t in trans.getElementsByTagName("transaction"):
+    p = {}
+    p["date"] = t.getAttribute("date")
+    p["userid"] = desc = t.getAttribute("description")
+    p["amount"] = t.getElementsByTagName("receive")[0].getAttribute("amount")
+    payments.append(p)
+  return payments
+
+
+@login_required 
+def importEbankingFile(request):
+  if not request.user.is_superuser:
+    return HttpResponse("user is not superuser!", status=403)
+
+  if request.method == "POST":
+    form = EBankingUploadForm(request.POST, request.FILES)
+    if form.is_valid():
+      try:
+        payments = processUploadedPayments(form.cleaned_data["paymentsFile"].read())
+        # TODO ne valja ovako... kako ovo moze obraditi!?
+        paymentsFrms = []
+        for p in payments:
+          paymentsFrms.append(EBankingSubForm(p))
+        return render_to_response('payments-from-file.html', {'username': request.user.username, 'forms': paymentsFrms}, context_instance=RequestContext(request))
+      except:
+        print "ERROR" # TODO sredi ovo
+        paymentsFrms = []
+  else:
+    form = EBankingUploadForm()
+
+  return render_to_response('payments-file.html', {'username': request.user.username, 'upload_form': form}, context_instance=RequestContext(request))
+
+
+# TODO sredi ovo!
+@login_required 
+def importEbankingPayments(request):
+  if not request.user.is_superuser:
+    return HttpResponse("user is not superuser!", status=403)
+
+  if request.method == "POST":
+    form = EBankingUploadForm(request.POST, request.FILES)
+    if form.is_valid():
+      try:
+        payments = processUploadedPayments(form.cleaned_data["paymentsFile"].read())
+        paymentsFrms = []
+        for p in payments:
+          paymentsFrms.append(EBankingSubForm(p))
+        return render_to_response('payments-from-file.html', {'username': request.user.username, 'forms': paymentsFrms}, context_instance=RequestContext(request))
+      except:
+        print "ERROR" # TODO sredi ovo
+        paymentsFrms = []
+  else:
+    form = EBankingUploadForm()
+
+  return render_to_response('payments-file.html', {'username': request.user.username, 'upload_form': form}, context_instance=RequestContext(request))
 

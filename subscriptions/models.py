@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.db import models
-from django.forms import ModelForm
+from django import forms
 from django.contrib.auth.models import User
 
 # Custom date widget for date field
@@ -35,11 +35,22 @@ class Bill(models.Model):
   # academic year in which this bill belongs to (format: "yyyy/yyyy", eg. "2006/2007")
   academicYear = models.CharField(max_length=9)
 
-class BillForm(ModelForm):
+class BillForm(forms.ModelForm):
   # enable custom date widget
   formfield_callback = makeCustomDatefield
   class Meta:
     model = Bill
+
+
+class EBankingSubForm(forms.Form):
+  userid = forms.IntegerField(min_value=0)
+  amount = forms.IntegerField(min_value=0)
+  date = forms.DateTimeField(input_formats='%d.%m.%Y.')
+
+
+class EBankingUploadForm(forms.Form):
+  paymentsFile = forms.FileField(label='XML - uplate')
+
 
 # User subscription
 class Subscription(models.Model):

@@ -63,6 +63,7 @@
   <h1>Hello {{ username }}!</h2>
   <a href="{% url staff %}">Staff page</a>
   <a href="{% url member %}">Member page</a>
+  <a href="{% url ebanking_payment %}">Upload ebanking XML file</a>
 
   <table id="subs" cellpadding="0" cellspacing="0" border="0" class="display">
     <thead>
@@ -121,7 +122,7 @@
   <h3>Dodaj račun</h3>
   <form name="add_bill_frm" action="{% url superuser %}" method="POST">
     {% csrf_token %}
-    {{ bill_form }}
+    {{ bill_form.as_ul }}
     <input type="submit" value="Dodaj" />
   </form>
 
