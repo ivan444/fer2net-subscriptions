@@ -2,6 +2,49 @@
 from django.db import models
 from django import forms
 from django.contrib.auth.models import User
+from django.db import connection
+from subscriptions.auth import VBULLETIN_CONFIG
+from datetime import datetime, timedelta
+
+#TODO: close cursor
+def fetchUser(uid):
+  """ Fetches one user from local space or retreives
+      user FORUM user and saves it locally."""
+  iUid = int(uid)
+
+  try:
+      user = User.objects.get(id=iUid)
+  except User.DoesNotExist:
+    cursor = connection.cursor()
+    cursor.execute("""SELECT userid, username, usergroupid,
+                      membergroupids, email
+                      FROM %suser WHERE userid = %d"""
+                   % (VBULLETIN_CONFIG['tableprefix'], iUid))
+    row = cursor.fetchone()
+    user = User(id=iUid, username=row[1], email=row[4])
+
+    user.is_staff = False
+    user.is_superuser = False
+  
+    # Process primary usergroup
+    if row[2] in VBULLETIN_CONFIG['superuser_groupids']:
+      user.is_staff = True    
+      user.is_superuser = True
+    elif row[2] in VBULLETIN_CONFIG['staff_groupids']:
+      user.is_staff = True
+    
+    # Process addtional usergroups
+    for groupid in row[3].split(','):
+      if groupid in VBULLETIN_CONFIG['superuser_groupids']:
+        user.is_superuser = True
+      if groupid in VBULLETIN_CONFIG['staff_groupids']:
+        user.is_staff = True
+    
+    user.set_unusable_password()
+    user.save()
+
+  return user
+
 
 # Custom date widget for date field
 def makeCustomDatefield(f):
@@ -45,7 +88,20 @@ class BillForm(forms.ModelForm):
 class EBankingSubForm(forms.Form):
   userid = forms.IntegerField(min_value=0)
   amount = forms.IntegerField(min_value=0)
-  date = forms.DateTimeField(input_formats='%d.%m.%Y.')
+  date = forms.DateField()#input_formats='%d.%m.%Y.')
+
+  def save(self):
+    # TODO: ovo ne mora biti točno!!!
+    admin = User.objects.get(pk=1)
+    # TODO: provjeri postoji li user!!!!
+    user = fetchUser(self.cleaned_data["userid"])
+    amount = self.cleaned_data["amount"]
+    date = self.cleaned_data["date"]
+    print "saving: " + str(user.username) + " " + str(amount)
+    s = Subscription(user=user, amount=amount, date=date, paymentType='E', subsEnd=date+timedelta(days=365))
+    s.paymaster=admin
+    s.save()
+    return s
 
 
 class EBankingUploadForm(forms.Form):

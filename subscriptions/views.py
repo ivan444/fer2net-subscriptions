@@ -6,13 +6,14 @@ from django.core.context_processors import csrf
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.models import User
 from django.template import RequestContext
+from django.forms.formsets import formset_factory
 from datetime import datetime, timedelta
 import logging
 import md5
 import xml.dom.minidom
 from django.db import connection
 from subscriptions.auth import VBULLETIN_CONFIG
-from subscriptions.models import Subscription, Bill, BillForm, EBankingUploadForm, EBankingSubForm
+from subscriptions.models import Subscription, Bill, BillForm, EBankingUploadForm, EBankingSubForm, fetchUser
 
 @login_required 
 def index(request):
@@ -125,46 +126,6 @@ def deletePayment(request, uid=None):
     return HttpResponse('{status:"ok"}', mimetype='application/javascript; charset=utf8')
 
 
-#TODO: close cursor
-def fetchUser(uid):
-  """ Fetches one user from local space or retreives
-      user FORUM user and saves it locally."""
-  iUid = int(uid)
-
-  try:
-      user = User.objects.get(id=iUid)
-  except User.DoesNotExist:
-    cursor = connection.cursor()
-    cursor.execute("""SELECT userid, username, usergroupid,
-                      membergroupids, email
-                      FROM %suser WHERE userid = %d"""
-                   % (VBULLETIN_CONFIG['tableprefix'], iUid))
-    row = cursor.fetchone()
-    user = User(id=iUid, username=row[1], email=row[4])
-
-    user.is_staff = False
-    user.is_superuser = False
-  
-    # Process primary usergroup
-    if row[2] in VBULLETIN_CONFIG['superuser_groupids']:
-      user.is_staff = True    
-      user.is_superuser = True
-    elif row[2] in VBULLETIN_CONFIG['staff_groupids']:
-      user.is_staff = True
-    
-    # Process addtional usergroups
-    for groupid in row[3].split(','):
-      if groupid in VBULLETIN_CONFIG['superuser_groupids']:
-        user.is_superuser = True
-      if groupid in VBULLETIN_CONFIG['staff_groupids']:
-        user.is_staff = True
-    
-    user.set_unusable_password()
-    user.save()
-
-  return user
-
-
 def loginview(request):
   # c is dictionary used to send data to template
   c = { 'next': 'index',          # Where to go after the login, default
@@ -233,40 +194,35 @@ def importEbankingFile(request):
     if form.is_valid():
       try:
         payments = processUploadedPayments(form.cleaned_data["paymentsFile"].read())
-        # TODO ne valja ovako... kako ovo moze obraditi!?
-        paymentsFrms = []
-        for p in payments:
-          paymentsFrms.append(EBankingSubForm(p))
-        return render_to_response('payments-from-file.html', {'username': request.user.username, 'forms': paymentsFrms}, context_instance=RequestContext(request))
+        PaymentFormSet = formset_factory(EBankingSubForm, extra=2, can_delete=True)
+        formset = PaymentFormSet(initial=payments)
+        return render_to_response('payments-from-file.html', {'username': request.user.username, 'formset': formset}, context_instance=RequestContext(request))
       except:
         print "ERROR" # TODO sredi ovo
-        paymentsFrms = []
   else:
     form = EBankingUploadForm()
 
   return render_to_response('payments-file.html', {'username': request.user.username, 'upload_form': form}, context_instance=RequestContext(request))
 
 
-# TODO sredi ovo!
 @login_required 
 def importEbankingPayments(request):
   if not request.user.is_superuser:
     return HttpResponse("user is not superuser!", status=403)
 
   if request.method == "POST":
-    form = EBankingUploadForm(request.POST, request.FILES)
-    if form.is_valid():
-      try:
-        payments = processUploadedPayments(form.cleaned_data["paymentsFile"].read())
-        paymentsFrms = []
-        for p in payments:
-          paymentsFrms.append(EBankingSubForm(p))
-        return render_to_response('payments-from-file.html', {'username': request.user.username, 'forms': paymentsFrms}, context_instance=RequestContext(request))
-      except:
-        print "ERROR" # TODO sredi ovo
-        paymentsFrms = []
-  else:
-    form = EBankingUploadForm()
+    PaymentFormSet = formset_factory(EBankingSubForm)
+    formset = PaymentFormSet(request.POST)
+    if formset.is_valid():
+      for frm in formset.forms:
+        print "save frm"
+        frm.save()
+    else:
+      print "Invalid form!!"
+      print formset.errors
 
-  return render_to_response('payments-file.html', {'username': request.user.username, 'upload_form': form}, context_instance=RequestContext(request))
+    return redirect("superuser")
+
+  else:
+    return redirect("ebanking_payment")
 
