@@ -1,0 +1,134 @@
+{% load subs-tags %}
+<!-- The DOCTYPE declaration above will set the    -->
+<!-- browser's rendering engine into               -->
+<!-- "Standards Mode". Replacing this declaration  -->
+<!-- with a "Quirks Mode" doctype may lead to some -->
+<!-- differences in layout.                        -->
+
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <link type="text/css" rel="stylesheet" href="{% url templates "f2net-subs.css" %}">
+    <link type="text/css" rel="stylesheet" href="{% url templates "demo_page.css" %}">
+    <link type="text/css" rel="stylesheet" href="{% url templates "demo_table.css" %}">
+    <link type="text/css" rel="stylesheet" href="{% url templates "demo_table_jui.css" %}">
+    <title>Fer2Net članarine</title>
+
+    <!--script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script-->
+    <script src="{% url js "jquery.js" %}" type="text/javascript"></script>	
+    <script src="{% url js "jquery.dataTables.min.js" %}" type="text/javascript"></script>	
+    <script type="text/javascript" src="{% url js "f2net-subs.js" %}"></script>
+
+  </head>
+
+<body>
+<script type="text/javascript">
+{% block start-scripts %}
+  $(document).ready(function() {
+    $('#byyear').dataTable();
+    $('#bills').dataTable();
+  });
+{% endblock %}
+</script>
+    
+  <!-- web app will not function without JavaScript enabled -->
+  <noscript>
+    <div style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
+      Your web browser must have JavaScript enabled
+      in order for this application to dis
+      
+lay correctly.
+    </div>
+  </noscript>
+
+  {% if msg_info %}
+    <div class="info">{{ msg_info }}</div>
+  {% endif %}
+
+  {% if msg_warning %}
+    <div class="warning">{{ msg_warning }}</div>
+  {% endif %}
+
+  {% if msg_success %}
+    <div class="success">{{ msg_success }}</div>
+  {% endif %}
+
+  <table id="totals" cellpadding="0" cellspacing="0" border="1" class="display">
+    <thead>
+      <tr>
+        <td>Opis</td>
+        <td>Iznos [kn]</td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Ukupno uplaćeno</td>
+        <td>{{ totalAmount }}</td>
+      </tr>
+      <tr>
+        <td>Ukupno uplaćeno (uživo)</td>
+        <td>{{ totalInPerson }}</td>
+      </tr>
+      <tr>
+        <td>Ukupno uplaćeno (e-banking)</td>
+        <td>{{ totalEBanking }}</td>
+      </tr>
+      <tr>
+        <td>Ukupno potrošeno</td>
+        <td>{{ totalExpense }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table id="byyear" cellpadding="0" cellspacing="0" border="0" class="display">
+    <thead>
+      <tr>
+        <td>Ak. god.</td>
+        <td>Uplata</td>
+        <td>Uplata (uživo)</td>
+        <td>Uplata (e-banking)</td>
+        <td>Troškovi</td>
+      </tr>
+    </thead>
+    <tbody>
+      {% for y in aYears %}
+        <tr>
+          <td>{{ y }}/{{ y|add:1 }}</td>
+          <td>{{ amountByYear|dget0:y }}</td>
+          <td>{{ inPersonByYear|dget0:y }}</td>
+          <td>{{ ebByYear|dget0:y }}</td>
+          <td>{{ expenseByYear|dget0:y }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h2>Računi</h2>
+  <table id="bills" cellpadding="0" cellspacing="0" border="0" class="display">
+    <thead>
+      <tr>
+        <td>Tip</td>
+        <td>Iznos</td>
+        <td>Datum plaćanja</td>
+        <td>Traje do</td>
+        <td>Ak. god.</td>
+      </tr>
+    </thead>
+    <tbody>
+      {% for b in bills %}
+        <tr>
+          <td>{{ b.billType }}</td>
+          <td>{{ b.amount }}</td>
+          <td>{{ b.date|date:"D d M Y" }}</td>
+          <td>{{ b.expirationDate|date:"D d M Y" }}</td>
+          <td>{{ b.academicYear }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <a href="{% url logout %}">Logout</a>
+
+  </body>
+</html>
+

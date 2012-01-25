@@ -160,15 +160,65 @@ def logoutview(request):
   return redirect("loginview")
 
 
+def startOfAcYear(year):
+  if year % 2 == 1: return year
+  else: return year-1
+
+
 @login_required
 def stats(request):
- # TODO
- # ukupno skupljeno po ak.godini,
- # ukupan trošak u akademskoj godini,
- # trenutno ukupno stanje f2 blagajne,
- # uplaćeno uživo/int. bankarstvom,
- # broj studenata koji je platio
-  return redirect("index")
+  # TODO izvesti sve preko db upita
+  # broj studenata koji je platio
+  # count payments by paymentType # eg. result: Subscription.objects.filter(valid=True).values('paymentType').annotate(payment_type_count=Count('paymentType'))
+  #Subscription.objects.filter(valid=True).values('paymentType').annotate(payment_type_count=Count('paymentType'))
+
+  # ukupno skupljeno po ak.godini,
+  # ukupan trošak u akademskoj godini,
+  # trenutno ukupno stanje f2 blagajne,
+  # uplaćeno uživo/int. bankarstvom,
+
+  totalAmount = 0
+  totalExpense = 0
+  totalInPerson = 0
+  totalEBanking = 0
+  amountByYear = {}
+  expenseByYear = {}
+  inPersonByYear = {}
+  ebByYear = {}
+  aYears = set()
+
+  subs = Subscription.objects.filter(valid=True).all()
+  for s in subs:
+    totalAmount += s.amount
+    aYear = startOfAcYear(s.date.year)
+    aYears.add(aYear)
+    amountByYear[aYear] = s.amount + amountByYear.get(aYear,0)
+    if s.paymentType == 'P':
+      totalInPerson += s.amount
+      inPersonByYear[aYear] = s.amount + inPersonByYear.get(aYear,0)
+    else:
+      totalEBanking += s.amount
+      ebByYear[aYear] = s.amount + ebByYear.get(aYear,0)
+  
+  bills = Bill.objects.all()
+  for b in bills:
+    totalExpense += b.amount
+    aYear = int(b.academicYear.split("/")[0])
+    aYears.add(aYear)
+    expenseByYear[aYear] = b.amount + expenseByYear.get(aYear,0)
+
+  context = {'totalAmount': totalAmount,
+      'totalExpense': totalExpense,
+      'totalInPerson':totalInPerson,
+      'totalEBanking':totalEBanking,
+      'amountByYear':amountByYear,
+      'expenseByYear':expenseByYear,
+      'inPersonByYear':inPersonByYear,
+      'ebByYear':ebByYear,
+      'aYears':aYears,
+      'bills':bills}
+
+  return render_to_response('stat.html', context)
 
 
 def reformatDate(dtStr):
