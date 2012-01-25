@@ -91,13 +91,13 @@ class EBankingSubForm(forms.Form):
   date = forms.DateField()#input_formats='%d.%m.%Y.')
 
   def save(self):
-    # TODO: ovo ne mora biti točno!!!
+    if self.cleaned_data == {}: return None
+    # TODO: ovo ne mora biti točno!!! dodati u config? ebaniking_paymaster_id?
     admin = User.objects.get(pk=1)
     # TODO: provjeri postoji li user!!!!
     user = fetchUser(self.cleaned_data["userid"])
     amount = self.cleaned_data["amount"]
     date = self.cleaned_data["date"]
-    print "saving: " + str(user.username) + " " + str(amount)
     s = Subscription(user=user, amount=amount, date=date, paymentType='E', subsEnd=date+timedelta(days=365))
     s.paymaster=admin
     s.save()

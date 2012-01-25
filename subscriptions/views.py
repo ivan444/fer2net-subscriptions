@@ -171,13 +171,21 @@ def stats(request):
   return redirect("index")
 
 
+def reformatDate(dtStr):
+  """
+  Transform date string from "dd.mm.yyyy." to "yyyy-mm-dd"
+  """
+  pts = dtStr.split(".")
+  return pts[2]+"-"+pts[1]+"-"+pts[0]
+
+
 def processUploadedPayments(xmlContents):
   payments = []
   doc = xml.dom.minidom.parseString(xmlContents)
   trans = doc.getElementsByTagName("transactions")[0]
   for t in trans.getElementsByTagName("transaction"):
     p = {}
-    p["date"] = t.getAttribute("date")
+    p["date"] = reformatDate(t.getAttribute("date"))
     p["userid"] = desc = t.getAttribute("description")
     p["amount"] = t.getElementsByTagName("receive")[0].getAttribute("amount")
     payments.append(p)
@@ -215,7 +223,6 @@ def importEbankingPayments(request):
     formset = PaymentFormSet(request.POST)
     if formset.is_valid():
       for frm in formset.forms:
-        print "save frm"
         frm.save()
     else:
       print "Invalid form!!"
