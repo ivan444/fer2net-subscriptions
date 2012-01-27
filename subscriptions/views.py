@@ -57,7 +57,7 @@ def indexStaff(request):
 
   cursor = connection.cursor()
 
-  cursor.execute("""SELECT userid, username, email
+  cursor.execute("""SELECT userid, usergroupid, membergroupids, username, email
                     FROM %suser"""
                  % (VBULLETIN_CONFIG['tableprefix']))
   rows = cursor.fetchall()
@@ -65,8 +65,12 @@ def indexStaff(request):
   for r in rows:
     usr = {}
     usr["userid"] = r[0]
-    usr["username"] = r[1]
-    usr["email"] = r[2]
+    if r[1] == VBULLETIN_CONFIG['paid_03_2013_groupid'] or VBULLETIN_CONFIG['paid_03_2013_groupid'] in r[2]:
+      usr["valid"] = True
+    else:
+      usr["valid"] = False
+    usr["username"] = r[3]
+    usr["email"] = r[4]
     subs = Subscription.objects.filter(user__id = int(r[0])).order_by('-date').all()
     if len(subs) == 0:
       usr["sub_expr"] = -365

@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <!-- The DOCTYPE declaration above will set the    -->
 <!-- browser's rendering engine into               -->
 <!-- "Standards Mode". Replacing this declaration  -->
@@ -91,9 +92,7 @@
   <noscript>
     <div style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
       Your web browser must have JavaScript enabled
-      in order for this application to dis
-      
-lay correctly.
+      in order for this application to display correctly.
     </div>
   </noscript>
 
@@ -131,9 +130,9 @@ lay correctly.
           <td>{{ u.username }}</td>
           <td>{{ u.email }}</td>
           <td><input id="amount_{{ u.userid }}" type="text" size="4" value="10" /></td>
-          <td><input id="paymentBtn_{{ u.userid }}" type="button" value="Uplati" onclick="makePayment('{{ u.userid }}', $('#amount_{{ u.userid }}').val())" /></td>
-          <td><input id="delayBtn_{{ u.userid }}" type="button" value="Odgoda" onclick="makePayment('{{ u.userid }}', '0')" /></td>
-          <td><input id="deleteBtn_{{ u.userid }}" disabled="true" type="button" value="Obriši" onclick="deletePayment('{{ u.userid }}')" /></td>
+          <td><input id="paymentBtn_{{ u.userid }}"{% if u.valid %} disabled="true"{% endif %} type="button" value="Uplati" onclick="makePayment('{{ u.userid }}', $('#amount_{{ u.userid }}').val())" /></td>
+          <td><input id="delayBtn_{{ u.userid }}"{% if u.valid %} disabled="true"{% endif %} type="button" value="Odgoda" onclick="makePayment('{{ u.userid }}', '0')" /></td>
+          <td><input id="deleteBtn_{{ u.userid }}"{% if not u.valid %} disabled="true"{% endif %} type="button" value="Obriši" onclick="deletePayment('{{ u.userid }}')" /></td>
         </tr>
       {% endfor %}
     </tbody>
