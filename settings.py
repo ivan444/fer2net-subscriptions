@@ -18,6 +18,8 @@ cfgAdminEmail = cfg.get("webconfig", "admin_email")
 cfgTablePrefix = cfg.get("webconfig", "tableprefix")
 cfgSuGids = cfg.get("webconfig", "superuser_groupids").split(",")
 cfgStaffGids = cfg.get("webconfig", "staff_groupids").split(",")
+cfgStandardGids = cfg.get("webconfig", "standard_groupids").split(",")
+cfgPaid032013Gid = cfg.get("webconfig", "paid_03_2013_groupid")
 
 DEBUG = cfgDebug.lower() == "true"
 TEMPLATE_DEBUG = DEBUG

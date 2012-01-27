@@ -7,6 +7,8 @@ VBULLETIN_CONFIG = {
     'tableprefix': settings.cfgTablePrefix,
     'superuser_groupids': settings.cfgSuGids,
     'staff_groupids': settings.cfgStaffGids,
+    'standard_groupids': settings.cfgStandardGids,
+    'paid_03_2013_groupid': settings.cfgPaid032013Gid
 }
 
 if hasattr(settings, 'VBULLETIN_CONFIG'):
