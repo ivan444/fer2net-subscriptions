@@ -215,7 +215,6 @@ def startOfAcYear(year):
 @login_required
 def stats(request):
   # TODO izvesti sve preko db upita
-  # broj studenata koji je platio
   # count payments by paymentType # eg. result: Subscription.objects.filter(valid=True).values('paymentType').annotate(payment_type_count=Count('paymentType'))
   #Subscription.objects.filter(valid=True).values('paymentType').annotate(payment_type_count=Count('paymentType'))
 
@@ -224,6 +223,7 @@ def stats(request):
   # trenutno ukupno stanje f2 blagajne,
   # uplaćeno uživo/int. bankarstvom,
 
+  numberOfPayments = 0
   totalAmount = 0
   totalExpense = 0
   totalInPerson = 0
@@ -236,6 +236,7 @@ def stats(request):
 
   subs = Subscription.objects.filter(valid=True).all()
   for s in subs:
+    if (s.valid == True): numberOfPayments += 1
     totalAmount += s.amount
     aYear = startOfAcYear(s.date.year)
     aYears.add(aYear)
@@ -254,7 +255,9 @@ def stats(request):
     aYears.add(aYear)
     expenseByYear[aYear] = b.amount + expenseByYear.get(aYear,0)
 
-  context = {'totalAmount': totalAmount,
+  context = {
+	  'numberOfPayments' :numberOfPayments,
+	  'totalAmount': totalAmount,
       'totalExpense': totalExpense,
       'totalInPerson':totalInPerson,
       'totalEBanking':totalEBanking,
