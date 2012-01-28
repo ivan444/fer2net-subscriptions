@@ -108,10 +108,33 @@ def makePayment(request, uid=None, amount=None):
 
 def activateMember(user):
   """Aktiviranje korisnika."""
-  pass # TODO
+  cursor = connection.cursor()
+
+  if (isUserStandard(user)):
+    query = """
+             UPDATE %suser
+             SET `usergroupid` = %s
+             WHERE userid = %s
+          """
+  else:
+    query = """
+             UPDATE %suser
+             SET `membergroupids` = TRIM(LEADING ',' FROM CONCAT(`membergroupids`, ',', '%s'))
+             WHERE userid = %s
+          """
+
+  cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], VBULLETIN_CONFIG['paid_03_2013_groupid'], user.id))
 
 
-@login_required 
+def isUserStandard(user):
+  """ Radi li se o standardnom korisniku (običan korisnik / nije platio ništa / nije platio za ovu godinu. """
+  cursor = connection.cursor()
+  cursor.execute("""SELECT usergroupid FROM %suser WHERE userid = %d"""
+                 % (VBULLETIN_CONFIG['tableprefix'], user.id))
+  row = cursor.fetchone()
+  return (row[0] in VBULLETIN_CONFIG['standard_groupids'])
+
+@login_required
 def deletePayment(request, uid=None):
   if uid==None: return Http404("no params")
   if not (request.user.is_staff or request.user.is_superuser):
