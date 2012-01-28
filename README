@@ -4,6 +4,8 @@ Fer2net subscriptions app
 Instalation
 ===========
 1) Copy config.properties-sample to config.properties and modify local settings.
+2) Initialize the database with
+   $ python manage.py syncdb
 
 Running on dev server
 =====================
