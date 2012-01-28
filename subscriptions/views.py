@@ -42,10 +42,13 @@ def indexSuperuser(request):
   else:
     form = BillForm()
 
+  subs = Subscription.objects.order_by('-date').all()
   bills = Bill.objects.order_by('-date').all()
 
+  # Human-readable tip računa
+  for b in bills:
+    b.billType = Bill.BILL_TYPES_DICT[b.billType]
 
-  subs = Subscription.objects.order_by('-date').all()
   return render_to_response('index-superuser.html', {'username': request.user.username, 'allSubs': subs, 'bill_form': form, 'allBills': bills}, context_instance=RequestContext(request))
 
 

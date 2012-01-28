@@ -64,6 +64,8 @@ class Bill(models.Model):
     ('D', 'domain'),
     ('O', 'other expenses'),
   )
+  BILL_TYPES_DICT = dict(BILL_TYPES)
+
   billType = models.CharField(max_length=1, choices=BILL_TYPES)
 
   # bill amount (size of bill)
