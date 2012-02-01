@@ -25,15 +25,15 @@ def fetchUser(uid):
 
     user.is_staff = False
     user.is_superuser = False
-  
+
     # Process primary usergroup
     if row[2] in VBULLETIN_CONFIG['superuser_groupids']:
       user.is_staff = True    
       user.is_superuser = True
     elif row[2] in VBULLETIN_CONFIG['staff_groupids']:
       user.is_staff = True
-    
-    # Process addtional usergroups
+
+    # Process additional usergroups
     for groupid in row[3].split(','):
       if groupid in VBULLETIN_CONFIG['superuser_groupids']:
         user.is_superuser = True
@@ -64,6 +64,8 @@ class Bill(models.Model):
     ('D', 'domain'),
     ('O', 'other expenses'),
   )
+  BILL_TYPES_DICT = dict(BILL_TYPES)
+
   billType = models.CharField(max_length=1, choices=BILL_TYPES)
 
   # bill amount (size of bill)

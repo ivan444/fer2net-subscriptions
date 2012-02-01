@@ -43,10 +43,13 @@ def indexSuperuser(request):
   else:
     form = BillForm()
 
+  subs = Subscription.objects.order_by('-date').all()
   bills = Bill.objects.order_by('-date').all()
 
+  # Human-readable tip računa
+  for b in bills:
+    b.billType = Bill.BILL_TYPES_DICT[b.billType]
 
-  subs = Subscription.objects.order_by('-date').all()
   return render_to_response('index-superuser.html', {'username': request.user.username, 'allSubs': subs, 'bill_form': form, 'allBills': bills}, context_instance=RequestContext(request))
 
 
@@ -58,7 +61,7 @@ def indexStaff(request):
 
   cursor = connection.cursor()
 
-  cursor.execute("""SELECT userid, username, email
+  cursor.execute("""SELECT userid, usergroupid, membergroupids, username, email
                     FROM %suser"""
                  % (VBULLETIN_CONFIG['tableprefix']))
   rows = cursor.fetchall()
@@ -66,8 +69,12 @@ def indexStaff(request):
   for r in rows:
     usr = {}
     usr["userid"] = r[0]
-    usr["username"] = r[1]
-    usr["email"] = r[2]
+    if r[1] == int(VBULLETIN_CONFIG['paid_03_2013_groupid']) or VBULLETIN_CONFIG['paid_03_2013_groupid'] in r[2]:
+      usr["valid"] = True
+    else:
+      usr["valid"] = False
+    usr["username"] = r[3]
+    usr["email"] = r[4]
     subs = Subscription.objects.filter(user__id = int(r[0])).order_by('-date').all()
     if len(subs) == 0:
       usr["sub_expr"] = -365
@@ -102,13 +109,7 @@ def makePayment(request, uid=None, amount=None):
 
   return HttpResponse('{status:"ok"}', mimetype='application/javascript; charset=utf8')
 
-
-def activateMember(user):
-  """Aktiviranje korisnika."""
-  pass # TODO
-
-
-@login_required 
+@login_required
 def deletePayment(request, uid=None):
   if uid==None: return Http404("no params")
   if not (request.user.is_staff or request.user.is_superuser):
@@ -121,11 +122,60 @@ def deletePayment(request, uid=None):
   if len(ss) == 0:
     return HttpResponse("there are no subscriptions to delete", status=404)
   else:
+    deactivateMember(user)
     sub = ss[0]
     sub.valid = False
     sub.save()
     return HttpResponse('{status:"ok"}', mimetype='application/javascript; charset=utf8')
 
+
+
+def activateMember(user):
+  """Aktiviranje korisnika."""
+  cursor = connection.cursor()
+
+  if (str(usergroupid(user)) in VBULLETIN_CONFIG['standard_groupids']):
+    query = """
+             UPDATE %suser
+             SET `usergroupid` = %s
+             WHERE userid = %s
+          """
+  else:
+    query = """
+             UPDATE %suser
+             SET `membergroupids` = TRIM(LEADING ',' FROM CONCAT(`membergroupids`, ',%s'))
+             WHERE userid = %s
+          """
+
+  cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], VBULLETIN_CONFIG['paid_03_2013_groupid'], user.id))
+
+
+def deactivateMember(user):
+  """Deaktiviranje korisnika."""
+  cursor = connection.cursor()
+
+  if (usergroupid(user) == int(VBULLETIN_CONFIG['paid_03_2013_groupid'])):
+    query = """
+             UPDATE %suser
+             SET `usergroupid` = %s
+             WHERE userid = %s
+          """
+    cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], VBULLETIN_CONFIG['not_paid_groupid'], user.id))
+  else:
+    query = """
+             UPDATE %suser
+             SET `membergroupids` = TRIM(LEADING ',' FROM REPLACE(`membergroupids`, '%s', ''))
+             WHERE userid = %s
+          """
+    cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], VBULLETIN_CONFIG['paid_03_2013_groupid'], user.id))
+
+def usergroupid(user):
+  """ Vraća usergroupid zadanog korisnika. """
+  cursor = connection.cursor()
+  cursor.execute("""SELECT usergroupid FROM %suser WHERE userid = %s"""
+                 % (VBULLETIN_CONFIG['tableprefix'], user.id))
+  row = cursor.fetchone()
+  return row[0]
 
 def loginview(request):
   # c is dictionary used to send data to template
@@ -169,7 +219,6 @@ def startOfAcYear(year):
 @login_required
 def stats(request):
   # TODO izvesti sve preko db upita
-  # broj studenata koji je platio
   # count payments by paymentType # eg. result: Subscription.objects.filter(valid=True).values('paymentType').annotate(payment_type_count=Count('paymentType'))
   #Subscription.objects.filter(valid=True).values('paymentType').annotate(payment_type_count=Count('paymentType'))
 
@@ -178,6 +227,7 @@ def stats(request):
   # trenutno ukupno stanje f2 blagajne,
   # uplaćeno uživo/int. bankarstvom,
 
+  numberOfPayments = 0
   totalAmount = 0
   totalExpense = 0
   totalInPerson = 0
@@ -190,6 +240,7 @@ def stats(request):
 
   subs = Subscription.objects.filter(valid=True).all()
   for s in subs:
+    if (s.valid == True): numberOfPayments += 1
     totalAmount += s.amount
     aYear = startOfAcYear(s.date.year)
     aYears.add(aYear)
@@ -208,7 +259,9 @@ def stats(request):
     aYears.add(aYear)
     expenseByYear[aYear] = b.amount + expenseByYear.get(aYear,0)
 
-  context = {'totalAmount': totalAmount,
+  context = {
+	  'numberOfPayments' :numberOfPayments,
+	  'totalAmount': totalAmount,
       'totalExpense': totalExpense,
       'totalInPerson':totalInPerson,
       'totalEBanking':totalEBanking,

@@ -11,4 +11,6 @@ admin_email=admin@mailinator.com
 tableprefix=
 superuser_groupids=6
 staff_groupids=5,7
-
+standard_groupids=2,190,192
+paid_03_2013_groupid=191
+not_paid_groupid=192
