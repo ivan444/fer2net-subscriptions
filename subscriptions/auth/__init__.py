@@ -1,6 +1,3 @@
-import logging
-logging.warning('Inside auth.__init__')
-
 import settings
 
 VBULLETIN_CONFIG = {

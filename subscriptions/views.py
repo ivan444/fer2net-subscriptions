@@ -46,11 +46,7 @@ def indexSuperuser(request):
   subs = Subscription.objects.order_by('-date').all()
   bills = Bill.objects.order_by('-date').all()
 
-  # Human-readable tip računa
-  for b in bills:
-    b.billType = Bill.BILL_TYPES_DICT[b.billType]
-
-  return render_to_response('index-superuser.html', {'username': request.user.username, 'allSubs': subs, 'bill_form': form, 'allBills': bills}, context_instance=RequestContext(request))
+  return render_to_response('index-superuser.html', {'username': request.user.username, 'allSubs': subs, 'bill_form': form, 'allBills': bills, 'billTypes': Bill.BILL_TYPES_DICT}, context_instance=RequestContext(request))
 
 
 #TODO: close cursor
@@ -111,6 +107,10 @@ def makePayment(request, uid=None, amount=None):
 
 @login_required
 def deletePayment(request, uid=None):
+  """
+  Delete payment (subscription) of User with id == uid which is made today.
+  Subscription will be deleted ONLY IF (s.paymaster == request.user AND s.date == today).
+  """
   if uid==None: return Http404("no params")
   if not (request.user.is_staff or request.user.is_superuser):
     return HttpResponse("user is not staff member!", status=403)
@@ -262,15 +262,16 @@ def stats(request):
   context = {
 	  'numberOfPayments' :numberOfPayments,
 	  'totalAmount': totalAmount,
-      'totalExpense': totalExpense,
-      'totalInPerson':totalInPerson,
-      'totalEBanking':totalEBanking,
-      'amountByYear':amountByYear,
-      'expenseByYear':expenseByYear,
-      'inPersonByYear':inPersonByYear,
-      'ebByYear':ebByYear,
-      'aYears':aYears,
-      'bills':bills}
+    'totalExpense': totalExpense,
+    'totalInPerson':totalInPerson,
+    'totalEBanking':totalEBanking,
+    'amountByYear':amountByYear,
+    'expenseByYear':expenseByYear,
+    'inPersonByYear':inPersonByYear,
+    'ebByYear':ebByYear,
+    'aYears':aYears,
+    'bills':bills,
+    'billTypes': Bill.BILL_TYPES_DICT}
 
   return render_to_response('stat.html', context)
 

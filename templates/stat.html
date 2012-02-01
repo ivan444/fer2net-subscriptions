@@ -129,7 +129,7 @@ lay correctly.
     <tbody>
       {% for b in bills %}
         <tr>
-          <td>{{ b.billType }}</td>
+          <td>{{ billTypes|dget:b.billType }}</td>
           <td>{{ b.amount }}</td>
           <td>{{ b.date|date:"D d M Y" }}</td>
           <td>{{ b.expirationDate|date:"D d M Y" }}</td>

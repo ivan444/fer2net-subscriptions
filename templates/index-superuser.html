@@ -1,3 +1,4 @@
+{% load subs-tags %}
 <!-- The DOCTYPE declaration above will set the    -->
 <!-- browser's rendering engine into               -->
 <!-- "Standards Mode". Replacing this declaration  -->
@@ -108,7 +109,7 @@
     <tbody>
       {% for b in allBills %}
         <tr>
-          <td>{{ b.billType }}</td>
+          <td>{{ billTypes|dget:b.billType }}</td>
           <td>{{ b.amount }}</td>
           <td>{{ b.date|date:"D d M Y" }}</td>
           <td>{{ b.expirationDate|date:"D d M Y" }}</td>
