@@ -24,6 +24,7 @@ def index(request):
   else:
     return indexMember(request)
 
+
 @login_required 
 def indexMember(request):
   subs = Subscription.objects.filter(user__id = request.user.id).order_by('-date').all()
@@ -275,6 +276,7 @@ def importEbankingPayments(request):
       for frm in formset.forms:
         frm.save()
     else:
+      # TODO obraditi greske...
       print "Invalid form!!"
       print formset.errors
 

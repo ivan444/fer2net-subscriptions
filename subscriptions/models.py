@@ -92,7 +92,7 @@ class EBankingSubForm(forms.Form):
 
   def save(self):
     if self.cleaned_data == {}: return None
-    # TODO: ovo ne mora biti točno!!! dodati u config? ebaniking_paymaster_id?
+    # TODO: ovo ne mora biti točno!!! dodati u config? ebaniking_paymaster_id? bolje: hidden field forme - id trenutno logiranog korisnika
     admin = User.objects.get(pk=1)
     # TODO: provjeri postoji li user!!!!
     user = fetchUser(self.cleaned_data["userid"])
