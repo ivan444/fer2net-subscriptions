@@ -235,16 +235,21 @@ def stats(request):
   amountByYear = {}
   expenseByYear = {}
   inPersonByYear = {}
+  paymentsByYear = {}
   ebByYear = {}
   aYears = set()
 
   subs = Subscription.objects.filter(valid=True).all()
   for s in subs:
-    if (s.valid == True): numberOfPayments += 1
-    totalAmount += s.amount
     aYear = startOfAcYear(s.date.year)
     aYears.add(aYear)
+
+    totalAmount += s.amount
     amountByYear[aYear] = s.amount + amountByYear.get(aYear,0)
+
+    numberOfPayments += 1
+    paymentsByYear[aYear] = 1 + paymentsByYear.get(aYear,0)
+
     if s.paymentType == 'P':
       totalInPerson += s.amount
       inPersonByYear[aYear] = s.amount + inPersonByYear.get(aYear,0)
@@ -261,6 +266,7 @@ def stats(request):
 
   context = {
 	  'numberOfPayments' :numberOfPayments,
+	  'paymentsByYear' :paymentsByYear,
 	  'totalAmount': totalAmount,
     'totalExpense': totalExpense,
     'totalInPerson':totalInPerson,
