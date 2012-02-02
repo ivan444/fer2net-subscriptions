@@ -13,7 +13,7 @@ import md5
 import xml.dom.minidom
 from django.db import connection
 from subscriptions.auth import VBULLETIN_CONFIG
-from subscriptions.models import Subscription, Bill, BillForm, EBankingUploadForm, EBankingSubForm, fetchUser
+from subscriptions.models import Subscription, Bill, BillForm, EBankingUploadForm, EBankingSubForm, fetchUser, activateMember, deactivateMember
 
 @login_required 
 def index(request):
@@ -49,7 +49,6 @@ def indexSuperuser(request):
   return render_to_response('index-superuser.html', {'username': request.user.username, 'allSubs': subs, 'bill_form': form, 'allBills': bills, 'billTypes': Bill.BILL_TYPES_DICT}, context_instance=RequestContext(request))
 
 
-#TODO: close cursor
 @login_required 
 def indexStaff(request):
   if not (request.user.is_staff or request.user.is_superuser):
@@ -65,7 +64,7 @@ def indexStaff(request):
   for r in rows:
     usr = {}
     usr["userid"] = r[0]
-    if r[1] == int(VBULLETIN_CONFIG['paid_03_2013_groupid']) or VBULLETIN_CONFIG['paid_03_2013_groupid'] in r[2]:
+    if r[1] == VBULLETIN_CONFIG['paid_03_2013_groupid'] or VBULLETIN_CONFIG['paid_03_2013_groupid'] in r[2]:
       usr["valid"] = True
     else:
       usr["valid"] = False
@@ -128,54 +127,6 @@ def deletePayment(request, uid=None):
     sub.save()
     return HttpResponse('{status:"ok"}', mimetype='application/javascript; charset=utf8')
 
-
-
-def activateMember(user):
-  """Aktiviranje korisnika."""
-  cursor = connection.cursor()
-
-  if (str(usergroupid(user)) in VBULLETIN_CONFIG['standard_groupids']):
-    query = """
-             UPDATE %suser
-             SET `usergroupid` = %s
-             WHERE userid = %s
-          """
-  else:
-    query = """
-             UPDATE %suser
-             SET `membergroupids` = TRIM(LEADING ',' FROM CONCAT(`membergroupids`, ',%s'))
-             WHERE userid = %s
-          """
-
-  cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], VBULLETIN_CONFIG['paid_03_2013_groupid'], user.id))
-
-
-def deactivateMember(user):
-  """Deaktiviranje korisnika."""
-  cursor = connection.cursor()
-
-  if (usergroupid(user) == int(VBULLETIN_CONFIG['paid_03_2013_groupid'])):
-    query = """
-             UPDATE %suser
-             SET `usergroupid` = %s
-             WHERE userid = %s
-          """
-    cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], VBULLETIN_CONFIG['not_paid_groupid'], user.id))
-  else:
-    query = """
-             UPDATE %suser
-             SET `membergroupids` = TRIM(LEADING ',' FROM REPLACE(`membergroupids`, '%s', ''))
-             WHERE userid = %s
-          """
-    cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], VBULLETIN_CONFIG['paid_03_2013_groupid'], user.id))
-
-def usergroupid(user):
-  """ Vraća usergroupid zadanog korisnika. """
-  cursor = connection.cursor()
-  cursor.execute("""SELECT usergroupid FROM %suser WHERE userid = %s"""
-                 % (VBULLETIN_CONFIG['tableprefix'], user.id))
-  row = cursor.fetchone()
-  return row[0]
 
 def loginview(request):
   # c is dictionary used to send data to template

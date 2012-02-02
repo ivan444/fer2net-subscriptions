@@ -11,7 +11,6 @@ class VBulletinBackend(ModelBackend):
     We override ModelBackend to make use of django.contrib.auth permissions
     """
 
-    # TODO: close cursor??
     def authenticate(self, username=None, password=None):
         logging.debug('Using VBulletinBackend')
         email = username
@@ -22,10 +21,10 @@ class VBulletinBackend(ModelBackend):
         cursor.execute("""SELECT userid, username, password, salt, usergroupid, membergroupids, email
                           FROM %suser WHERE email = '%s'"""
                        % (VBULLETIN_CONFIG['tableprefix'], email))
-        row = cursor.fetchone()
-        
-        print str(row[4]), str(VBULLETIN_CONFIG['superuser_groupids']), str(str(row[4]) in VBULLETIN_CONFIG['superuser_groupids'])
-        
+        allRows = cursor.fetchall()
+        if len(allRows) == 0: return None
+        else: row = allRows[0]
+
         hashed = md5.new(md5.new(password).hexdigest() + row[3]).hexdigest()
         
         id = int(row[0])

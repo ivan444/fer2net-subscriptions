@@ -5,8 +5,70 @@ from django.contrib.auth.models import User
 from django.db import connection
 from subscriptions.auth import VBULLETIN_CONFIG
 from datetime import datetime, timedelta
+import logging
 
-#TODO: close cursor
+
+def activateMember(user):
+  """Aktiviranje korisnika."""
+  cursor = connection.cursor()
+
+  if (str(usergroupid(user)) in VBULLETIN_CONFIG['standard_groupids']):
+    query = """
+             UPDATE %suser
+             SET `usergroupid` = %s
+             WHERE userid = %s
+          """
+  else:
+    query = """
+             UPDATE %suser
+             SET `membergroupids` = TRIM(LEADING ',' FROM CONCAT(`membergroupids`, ',%s'))
+             WHERE userid = %s
+          """
+
+  cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], VBULLETIN_CONFIG['paid_03_2013_groupid'], user.id))
+
+  user.profile.subscribed = True
+  user.save()
+
+
+def deactivateMember(user):
+  """Deaktiviranje korisnika."""
+  cursor = connection.cursor()
+
+  if (usergroupid(user) == int(VBULLETIN_CONFIG['paid_03_2013_groupid'])):
+    query = """
+             UPDATE %suser
+             SET `usergroupid` = %s
+             WHERE userid = %s
+          """
+    cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], VBULLETIN_CONFIG['not_paid_groupid'], user.id))
+  else:
+    query = """
+             UPDATE %suser
+             SET `membergroupids` = TRIM(LEADING ',' FROM REPLACE(`membergroupids`, '%s', ''))
+             WHERE userid = %s
+          """
+    cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], VBULLETIN_CONFIG['paid_03_2013_groupid'], user.id))
+
+  user.profile.subscribed = False
+  user.save()
+
+
+def usergroupid(user):
+  """ Vraća usergroupid zadanog korisnika. """
+  cursor = connection.cursor()
+  cursor.execute("""SELECT usergroupid FROM %suser WHERE userid = %s"""
+                 % (VBULLETIN_CONFIG['tableprefix'], user.id))
+  row = cursor.fetchone()
+  return row[0]
+
+class UserProfile(models.Model):
+  user = models.ForeignKey(User, unique=True)
+  subscribed = models.BooleanField(default=False)
+
+User.profile = property(lambda u: UserProfile.objects.get_or_create(user=u)[0])
+
+
 def fetchUser(uid):
   """ Fetches one user from local space or retreives
       user FORUM user and saves it locally."""
@@ -20,7 +82,11 @@ def fetchUser(uid):
                       membergroupids, email
                       FROM %suser WHERE userid = %d"""
                    % (VBULLETIN_CONFIG['tableprefix'], iUid))
-    row = cursor.fetchone()
+
+    allRows = cursor.fetchall()
+    if len(allRows) == 0: return None
+    else: row = allRows[0]
+
     user = User(id=iUid, username=row[1], email=row[4])
 
     user.is_staff = False
@@ -32,6 +98,10 @@ def fetchUser(uid):
       user.is_superuser = True
     elif row[2] in VBULLETIN_CONFIG['staff_groupids']:
       user.is_staff = True
+
+    # Check if user is subscribed
+    if r[2] == VBULLETIN_CONFIG['paid_03_2013_groupid'] or VBULLETIN_CONFIG['paid_03_2013_groupid'] in r[3]:
+      user.profile.subscribed = True
 
     # Process additional usergroups
     for groupid in row[3].split(','):
@@ -90,19 +160,30 @@ class BillForm(forms.ModelForm):
 class EBankingSubForm(forms.Form):
   userid = forms.IntegerField(min_value=0)
   amount = forms.IntegerField(min_value=0)
-  date = forms.DateField()#input_formats='%d.%m.%Y.')
+  date = forms.DateField()
 
   def save(self):
     if self.cleaned_data == {}: return None
     # TODO: ovo ne mora biti točno!!! dodati u config? ebaniking_paymaster_id? bolje: hidden field forme - id trenutno logiranog korisnika
     admin = User.objects.get(pk=1)
-    # TODO: provjeri postoji li user!!!!
+
     user = fetchUser(self.cleaned_data["userid"])
+    if user == None:
+      logging.warn("User with ID '%s' doesn't exist in Forum DB!" % (self.cleaned_data["userid"],))
+      return None
+
+    # skip if already subscribed
+    if user.profile.subscribed:
+      logging.warn("User with ID '%s' is already subscribed!" % (self.cleaned_data["userid"],))
+      return None
+
     amount = self.cleaned_data["amount"]
     date = self.cleaned_data["date"]
     s = Subscription(user=user, amount=amount, date=date, paymentType='E', subsEnd=date+timedelta(days=365))
     s.paymaster=admin
     s.save()
+    activateMember(user)
+    logging.debug("User with ID '%s' is now subscribed using e-banking." % (self.cleaned_data["userid"],))
     return s
 
 
