@@ -104,6 +104,28 @@ def makePayment(request, uid=None, amount=None):
 
   return HttpResponse('{status:"ok"}', mimetype='application/javascript; charset=utf8')
 
+
+@login_required
+def superuserDeletePayment(request, sid=None):
+  """
+  Delete payment (subscription) with id = sid. This is superuser onlyy method!
+  """
+  if sid==None: return Http404("no params")
+  if not request.user.is_superuser:
+    return HttpResponse("user is not superuser!", status=403)
+
+  iSid = int(sid)
+  try:
+    s = Subscription.objects.get(pk=iSid)
+  except Subscription.DoesNotExist:
+    return HttpResponse("subscription with ID %d does not exist!" % (sid,), status=404)
+
+  s.delete()
+
+  request.session.modified = True
+  return HttpResponse('{status:"ok"}', mimetype='application/javascript; charset=utf8')
+
+
 @login_required
 def deletePayment(request, uid=None):
   """
