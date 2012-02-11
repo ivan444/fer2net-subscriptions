@@ -25,7 +25,7 @@ def activateMember(user):
              WHERE userid = %s
           """
 
-  cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], VBULLETIN_CONFIG['paid_03_2013_groupid'], user.id))
+  cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], VBULLETIN_CONFIG['paid_groupid'], user.id))
 
   user.profile.subscribed = True
   user.save()
@@ -35,7 +35,7 @@ def deactivateMember(user):
   """Deaktiviranje korisnika."""
   cursor = connection.cursor()
 
-  if (usergroupid(user) == int(VBULLETIN_CONFIG['paid_03_2013_groupid'])):
+  if (usergroupid(user) == int(VBULLETIN_CONFIG['paid_groupid'])):
     query = """
              UPDATE %suser
              SET `usergroupid` = %s
@@ -48,7 +48,7 @@ def deactivateMember(user):
              SET `membergroupids` = TRIM(LEADING ',' FROM REPLACE(`membergroupids`, '%s', ''))
              WHERE userid = %s
           """
-    cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], VBULLETIN_CONFIG['paid_03_2013_groupid'], user.id))
+    cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], VBULLETIN_CONFIG['paid_groupid'], user.id))
 
   user.profile.subscribed = False
   user.save()
@@ -100,7 +100,7 @@ def fetchUser(uid):
       user.is_staff = True
 
     # Check if user is subscribed
-    if r[2] == VBULLETIN_CONFIG['paid_03_2013_groupid'] or VBULLETIN_CONFIG['paid_03_2013_groupid'] in r[3]:
+    if r[2] == VBULLETIN_CONFIG['paid_groupid'] or VBULLETIN_CONFIG['paid_groupid'] in r[3]:
       user.profile.subscribed = True
 
     # Process additional usergroups
