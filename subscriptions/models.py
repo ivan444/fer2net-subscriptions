@@ -80,8 +80,8 @@ def fetchUser(uid):
     cursor = connection.cursor()
     cursor.execute("""SELECT userid, username, usergroupid,
                       membergroupids, email
-                      FROM %suser WHERE userid = %d""",
-                   [VBULLETIN_CONFIG['tableprefix'], iUid])
+                      FROM """ + VBULLETIN_CONFIG['tableprefix'] + """user WHERE userid = %d""",
+                   [iUid])
 
     allRows = cursor.fetchall()
     if len(allRows) == 0: return None

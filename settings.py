@@ -13,6 +13,7 @@ dbPass = cfg.get("webconfig", "password")
 dbHost = cfg.get("webconfig", "host")
 dbPort = cfg.get("webconfig", "port")
 cfgDebug = cfg.get("webconfig", "debug")
+cfgDevserver = cfg.getboolean("webconfig", "django-devserver")
 cfgAdminName = cfg.get("webconfig", "admin_name")
 cfgAdminEmail = cfg.get("webconfig", "admin_email")
 cfgTablePrefix = cfg.get("webconfig", "tableprefix")
@@ -145,6 +146,9 @@ INSTALLED_APPS = (
   'django.contrib.admin',
   'subscriptions',
 )
+
+if cfgDevserver:
+  INSTALLED_APPS += ('devserver',)
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

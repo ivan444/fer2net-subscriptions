@@ -18,9 +18,9 @@ class VBulletinBackend(ModelBackend):
         from django.db import connection
         cursor = connection.cursor()
 
-        cursor.execute("""SELECT userid, username, password, salt, usergroupid, membergroupids, email
-                          FROM %suser WHERE email = '%s'""",
-                       [VBULLETIN_CONFIG['tableprefix'], email])
+        sql = """SELECT userid, username, password, salt, usergroupid, membergroupids, email
+                 FROM """ + VBULLETIN_CONFIG['tableprefix'] + """user WHERE email = %s"""
+        cursor.execute(sql, [email])
         allRows = cursor.fetchall()
         if len(allRows) == 0: return None
         else: row = allRows[0]
