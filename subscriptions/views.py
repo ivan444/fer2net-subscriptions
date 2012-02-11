@@ -191,15 +191,6 @@ def startOfAcYear(year):
 
 @login_required
 def stats(request):
-  # TODO izvesti sve preko db upita
-  # count payments by paymentType # eg. result: Subscription.objects.filter(valid=True).values('paymentType').annotate(payment_type_count=Count('paymentType'))
-  #Subscription.objects.filter(valid=True).values('paymentType').annotate(payment_type_count=Count('paymentType'))
-
-  # ukupno skupljeno po ak.godini,
-  # ukupan trošak u akademskoj godini,
-  # trenutno ukupno stanje f2 blagajne,
-  # uplaćeno uživo/int. bankarstvom,
-
   numberOfPayments = 0
   totalAmount = 0
   totalExpense = 0
@@ -212,7 +203,7 @@ def stats(request):
   ebByYear = {}
   aYears = set()
 
-  subs = Subscription.objects.filter(valid=True).all()
+  subs = Subscription.objects.filter(valid=True).filter(amount__gt=0).all()
   for s in subs:
     aYear = startOfAcYear(s.date.year)
     aYears.add(aYear)
@@ -238,10 +229,10 @@ def stats(request):
     expenseByYear[aYear] = b.amount + expenseByYear.get(aYear,0)
 
   context = {
-	  'numberOfPayments' :numberOfPayments,
-	  'paymentsByYear' :paymentsByYear,
-	  'totalAmount': totalAmount,
-    'totalExpense': totalExpense,
+	  'numberOfPayments':numberOfPayments,
+	  'paymentsByYear':paymentsByYear,
+	  'totalAmount':totalAmount,
+    'totalExpense':totalExpense,
     'totalInPerson':totalInPerson,
     'totalEBanking':totalEBanking,
     'amountByYear':amountByYear,
@@ -252,7 +243,7 @@ def stats(request):
     'bills':bills,
     'billTypes': Bill.BILL_TYPES_DICT}
 
-  return render_to_response('stat.html', context)
+  return render_to_response('stat.html', context, context_instance=RequestContext(request))
 
 
 def reformatDate(dtStr):

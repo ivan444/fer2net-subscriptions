@@ -54,6 +54,8 @@ lay correctly.
     <div class="success">{{ msg_success }}</div>
   {% endif %}
 
+  <h1>Hello {{ request.user.username }}!</h1>
+
   <table id="totals" cellpadding="0" cellspacing="0" border="1" class="display">
     <thead>
       <tr>
@@ -111,7 +113,8 @@ lay correctly.
     </tbody>
   </table>
 
-  <h2>Računi</h2>
+  {% if request.user.is_staff %}
+  <h2>Računi (staff only!)</h2>
   <table id="bills" cellpadding="0" cellspacing="0" border="0" class="display">
     <thead>
       <tr>
@@ -120,6 +123,7 @@ lay correctly.
         <td>Datum plaćanja</td>
         <td>Traje do</td>
         <td>Ak. god.</td>
+        <td>Komentar</td>
       </tr>
     </thead>
     <tbody>
@@ -130,10 +134,12 @@ lay correctly.
           <td>{{ b.date|date:"D d M Y" }}</td>
           <td>{{ b.expirationDate|date:"D d M Y" }}</td>
           <td>{{ b.academicYear }}</td>
+          <td>{{ b.comment|default_if_none:"-" }}</td>
         </tr>
       {% endfor %}
     </tbody>
   </table>
+  {% endif %}
 
   <a href="{% url logout %}">Logout</a>
 

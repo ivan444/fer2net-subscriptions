@@ -129,6 +129,7 @@
         <td>Datum plaćanja</td>
         <td>Traje do</td>
         <td>Ak. god.</td>
+        <td>Komentar</td>
       </tr>
     </thead>
     <tbody>
@@ -139,6 +140,7 @@
           <td>{{ b.date|date:"D d M Y" }}</td>
           <td>{{ b.expirationDate|date:"D d M Y" }}</td>
           <td>{{ b.academicYear }}</td>
+          <td>{{ b.comment|default_if_none:"-" }}</td>
         </tr>
       {% endfor %}
     </tbody>

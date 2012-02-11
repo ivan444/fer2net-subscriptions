@@ -150,6 +150,9 @@ class Bill(models.Model):
   # academic year in which this bill belongs to (format: "yyyy/yyyy", eg. "2006/2007")
   academicYear = models.CharField(max_length=9)
 
+  # bill comment
+  comment = models.CharField(max_length=256)
+
 class BillForm(forms.ModelForm):
   # enable custom date widget
   formfield_callback = makeCustomDatefield
