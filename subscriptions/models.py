@@ -18,6 +18,12 @@ def activateMember(user):
              SET `usergroupid` = %s
              WHERE userid = %s
           """
+  elif usergroupid(user) == int(VBULLETIN_CONFIG['banned_groupid']):
+    query = """
+             UPDATE %suserban
+             SET `usergroupid` = %s
+             WHERE userid = %s
+          """
   else:
     query = """
              UPDATE %suser
@@ -35,13 +41,22 @@ def deactivateMember(user):
   """Deaktiviranje korisnika."""
   cursor = connection.cursor()
 
-  if (usergroupid(user) == int(VBULLETIN_CONFIG['paid_groupid'])):
+  if usergroupid(user) == int(VBULLETIN_CONFIG['paid_groupid']):
     query = """
              UPDATE %suser
              SET `usergroupid` = %s
              WHERE userid = %s
           """
     cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], VBULLETIN_CONFIG['not_paid_groupid'], user.id))
+
+  elif userbannedgroupid(user) == int(VBULLETIN_CONFIG['paid_groupid']):
+    query = """
+             UPDATE %suserban
+             SET `usergroupid` = %s
+             WHERE userid = %s
+          """
+    cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], VBULLETIN_CONFIG['not_paid_groupid'], user.id))
+
   else:
     query = """
              UPDATE %suser
@@ -59,6 +74,14 @@ def usergroupid(user):
   cursor = connection.cursor()
   cursor.execute("""SELECT usergroupid FROM %suser WHERE userid = %s"""
                  % (VBULLETIN_CONFIG['tableprefix'], user.id))
+  row = cursor.fetchone()
+  return row[0]
+
+def userbannedgroupid(user):
+  """ Vraća usergroupid zadanog korisnika koji ima ban. """
+  cursor = connection.cursor()
+  cursor.execute("""SELECT usergroupid FROM %suserban WHERE userid = %s"""
+  % (VBULLETIN_CONFIG['tableprefix'], user.id))
   row = cursor.fetchone()
   return row[0]
 
