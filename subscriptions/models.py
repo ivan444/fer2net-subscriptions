@@ -75,7 +75,8 @@ def usergroupid(user):
   cursor.execute("""SELECT usergroupid FROM %suser WHERE userid = %s"""
                  % (VBULLETIN_CONFIG['tableprefix'], user.id))
   row = cursor.fetchone()
-  return row[0]
+  return int(row[0])
+
 
 def userbannedgroupid(user):
   """ Vraća usergroupid zadanog korisnika koji ima ban. """
@@ -83,7 +84,8 @@ def userbannedgroupid(user):
   cursor.execute("""SELECT usergroupid FROM %suserban WHERE userid = %s"""
   % (VBULLETIN_CONFIG['tableprefix'], user.id))
   row = cursor.fetchone()
-  return row[0]
+  return int(row[0])
+
 
 class UserProfile(models.Model):
   user = models.ForeignKey(User, unique=True)
