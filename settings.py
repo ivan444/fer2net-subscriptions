@@ -163,17 +163,42 @@ if cfgDevserver:
 LOGGING = {
   'version': 1,
   'disable_existing_loggers': False,
+  'formatters': {
+    'verbose': {
+      'format': '%(levelname)s %(asctime)s %(module)s - %(message)s'
+      },
+    'simple': {
+      'format': '%(levelname)s %(message)s'
+      },
+  },
   'handlers': {
     'mail_admins': {
       'level': 'ERROR',
       'class': 'django.utils.log.AdminEmailHandler'
-    }
+    },
+    'file':{
+      'level': 'INFO',
+      'class': 'logging.handlers.RotatingFileHandler',
+      'filename': 'info.log',
+      'formatter': 'verbose',
+      'maxBytes': 10485760,
+      'backupCount': 10,
+    },
+    'console':{
+      'level':'DEBUG',
+      'class':'logging.StreamHandler',
+      'formatter': 'simple'
+    },
   },
   'loggers': {
     'django.request': {
       'handlers': ['mail_admins'],
       'level': 'ERROR',
       'propagate': True,
+    },
+    'subscriptions': {
+      'handlers': ['file', 'mail_admins'],
+      'level': 'INFO',
     },
   }
 }

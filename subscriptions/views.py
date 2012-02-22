@@ -15,8 +15,11 @@ from django.db import connection
 from subscriptions.auth import VBULLETIN_CONFIG
 from subscriptions.models import Subscription, Bill, BillForm, EBankingUploadForm, EBankingSubForm, fetchUser, activateMember, deactivateMember
 
+logger = logging.getLogger('subscriptions')
+
 @login_required 
 def index(request):
+  logger.info("test...")
   if request.user.is_superuser:
     return indexSuperuser(request)
   elif request.user.is_staff:
@@ -102,13 +105,15 @@ def makePayment(request, uid=None, amount=None):
 
   activateMember(user)
 
+  logger.info("Made inperson payment for user (%d, %s) by paymaster (%d, %s), amount %d" % (user.id, user.username, request.user.id, request.user.username, intAmount))
+
   return HttpResponse('{status:"ok"}', mimetype='application/javascript; charset=utf8')
 
 
 @login_required
 def superuserDeletePayment(request, sid=None):
   """
-  Delete payment (subscription) with id = sid. This is superuser onlyy method!
+  Delete payment (subscription) with id = sid. This is superuser only method!
   """
   if sid==None: return Http404("no params")
   if not request.user.is_superuser:
@@ -117,9 +122,14 @@ def superuserDeletePayment(request, sid=None):
   iSid = int(sid)
   try:
     s = Subscription.objects.get(pk=iSid)
+    if s.valid:
+      snewst = s.user.subscriptions.filter(valid=True).order_by('-subsEnd')[0]
+      if snewst.id == s.id:
+        deactivateMember(s.user)
   except Subscription.DoesNotExist:
     return HttpResponse("subscription with ID %d does not exist!" % (sid,), status=404)
 
+  logger.info("Superuser (%s) deleted subscription with ID %d (date, user, userId) = (%s, %s, %d)" % (request.user.username, s.id, s.date, s.user.username, s.user.id))
   s.delete()
 
   request.session.modified = True
@@ -147,6 +157,8 @@ def deletePayment(request, uid=None):
     sub = ss[0]
     sub.valid = False
     sub.save()
+
+    logger.info("Staff member (%s) invalidated (deleted) subscription with ID %d (date, user, userId) = (%s, %s, %d)" % (request.user.username, sub.id, sub.date, sub.user.username, sub.user.id))
     return HttpResponse('{status:"ok"}', mimetype='application/javascript; charset=utf8')
 
 
@@ -180,17 +192,28 @@ def loginview(request):
 
 
 def logoutview(request):
+  """ Do user logout. """
   logout(request)
   return redirect("loginview")
 
 
 def startOfAcYear(year):
+  """
+  Get start year of 'academic year' in which given
+  year belongs. E.g.:
+  year 2011 belongs to ac. year 2011/2012 - startOfAcYear(2011) == 2011
+  year 2012 belongs to ac. year 2011/2012 - startOfAcYear(2012) == 2011 (!)
+  """
   if year % 2 == 1: return year
   else: return year-1
 
 
 @login_required
 def stats(request):
+  """
+  Display statistics.
+  """
+
   numberOfPayments = 0
   totalAmount = 0
   totalExpense = 0

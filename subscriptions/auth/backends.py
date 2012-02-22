@@ -6,13 +6,15 @@ from django.contrib.auth.backends import ModelBackend
 
 from subscriptions.auth import VBULLETIN_CONFIG
 
+logger = logging.getLogger('subscriptions')
+
 class VBulletinBackend(ModelBackend):
     """
     We override ModelBackend to make use of django.contrib.auth permissions
     """
 
     def authenticate(self, username=None, password=None):
-        logging.debug('Using VBulletinBackend')
+        logger.debug('Using VBulletinBackend')
         email = username
         
         from django.db import connection
@@ -53,6 +55,8 @@ class VBulletinBackend(ModelBackend):
                 
                 user.set_unusable_password()
                 user.save()
+
+            logger.info("User with id " + str(user.id) + " logged in.")
             return user
             
         return None

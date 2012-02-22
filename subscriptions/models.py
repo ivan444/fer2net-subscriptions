@@ -105,7 +105,7 @@ def fetchUser(uid):
     cursor = connection.cursor()
     cursor.execute("""SELECT userid, username, usergroupid,
                       membergroupids, email
-                      FROM """ + VBULLETIN_CONFIG['tableprefix'] + """user WHERE userid = %d""",
+                      FROM """ + VBULLETIN_CONFIG['tableprefix'] + """user WHERE userid = %s""",
                    [iUid])
 
     allRows = cursor.fetchall()
@@ -125,7 +125,7 @@ def fetchUser(uid):
       user.is_staff = True
 
     # Check if user is subscribed
-    if r[2] == VBULLETIN_CONFIG['paid_groupid'] or VBULLETIN_CONFIG['paid_groupid'] in r[3]:
+    if row[2] == VBULLETIN_CONFIG['paid_groupid'] or VBULLETIN_CONFIG['paid_groupid'] in row[3].split(","):
       user.profile.subscribed = True
 
     # Process additional usergroups

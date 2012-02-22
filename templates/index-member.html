@@ -21,11 +21,16 @@
     
   <img src="{% url images "knob_message.png" %}" />
   <h2>{{ username }}</h2>
-  <ul>
+  <table border="1">
+    <tr><td>Datum uplate</td><td>Datum isteka</td><td>Izvršitelj uplate</td></tr>
     {% for s in subs %}
-    <li>{{ s.date }} {{ s.subsEnd }} {{ s.paymaster.username }}</li>
+    <tr>
+      <td>{{ s.date }}</td>
+      <td>{{ s.subsEnd }}</td>
+      <td>{{ s.paymaster.username }}</td>
+    </tr>
     {% endfor %}
-  </ul>
+  </table>
   <a href="{% url logout %}">Logout</a>
 
   </body>
