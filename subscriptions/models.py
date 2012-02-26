@@ -7,9 +7,10 @@ from subscriptions.auth import VBULLETIN_CONFIG
 from datetime import datetime, timedelta
 import logging
 
+logger = logging.getLogger('subscriptions')
 
 def activateMember(user):
-  """Aktiviranje korisnika."""
+  """Activation of an member."""
   cursor = connection.cursor()
 
   if (str(usergroupid(user)) in VBULLETIN_CONFIG['standard_groupids']):
@@ -36,9 +37,11 @@ def activateMember(user):
   user.profile.subscribed = True
   user.save()
 
+  logger.info("User with ID %d is now activated!" % (user.id,))
+
 
 def deactivateMember(user):
-  """Deaktiviranje korisnika."""
+  """Deactivation of an member."""
   cursor = connection.cursor()
 
   if usergroupid(user) == int(VBULLETIN_CONFIG['paid_groupid']):
@@ -68,9 +71,13 @@ def deactivateMember(user):
   user.profile.subscribed = False
   user.save()
 
+  logger.info("User with ID %d is now deactivated!" % (user.id,))
+
 
 def usergroupid(user):
-  """ Vraća usergroupid zadanog korisnika. """
+  """
+  Returns usergroupid of given user.
+  """
   cursor = connection.cursor()
   cursor.execute("""SELECT usergroupid FROM %suser WHERE userid = %s"""
                  % (VBULLETIN_CONFIG['tableprefix'], user.id))
@@ -79,7 +86,9 @@ def usergroupid(user):
 
 
 def userbannedgroupid(user):
-  """ Vraća usergroupid zadanog korisnika koji ima ban. """
+  """
+  Returns usergroupid of given user who is banned.
+  """
   cursor = connection.cursor()
   cursor.execute("""SELECT usergroupid FROM %suserban WHERE userid = %s"""
   % (VBULLETIN_CONFIG['tableprefix'], user.id))
@@ -141,8 +150,8 @@ def fetchUser(uid):
   return user
 
 
-# Custom date widget for date field
 def makeCustomDatefield(f):
+  """Custom date widget for date field."""
   formfield = f.formfield()
   if isinstance(f, models.DateField):
     formfield.widget.format = '%m/%d/%Y'
@@ -177,6 +186,7 @@ class Bill(models.Model):
 
   # bill comment
   comment = models.CharField(max_length=256)
+
 
 class BillForm(forms.ModelForm):
   # enable custom date widget
@@ -216,7 +226,7 @@ class EBankingSubForm(forms.Form):
 
 
 class EBankingUploadForm(forms.Form):
-  paymentsFile = forms.FileField(label='XML - uplate')
+  paymentsFile = forms.FileField(label='XML - transactions')
 
 
 # User subscription

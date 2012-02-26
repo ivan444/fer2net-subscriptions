@@ -19,7 +19,6 @@ logger = logging.getLogger('subscriptions')
 
 @login_required 
 def index(request):
-  logger.info("test...")
   if request.user.is_superuser:
     return indexSuperuser(request)
   elif request.user.is_staff:
@@ -87,6 +86,9 @@ def indexStaff(request):
 
 @login_required 
 def makePayment(request, uid=None, amount=None):
+  """
+  Make payment for user (create subscription).
+  """
   if uid==None or amount==None: return Http404("no params")
   if not (request.user.is_staff or request.user.is_superuser):
     return HttpResponse("user is not staff member!", status=403)
@@ -105,7 +107,7 @@ def makePayment(request, uid=None, amount=None):
 
   activateMember(user)
 
-  logger.info("Made inperson payment for user (%d, %s) by paymaster (%d, %s), amount %d" % (user.id, user.username, request.user.id, request.user.username, intAmount))
+  logger.info("Made in-person (live) payment for user (%d, %s) by paymaster (%d, %s), amount %d." % (user.id, user.username, request.user.id, request.user.username, intAmount))
 
   return HttpResponse('{status:"ok"}', mimetype='application/javascript; charset=utf8')
 
@@ -129,7 +131,7 @@ def superuserDeletePayment(request, sid=None):
   except Subscription.DoesNotExist:
     return HttpResponse("subscription with ID %d does not exist!" % (sid,), status=404)
 
-  logger.info("Superuser (%s) deleted subscription with ID %d (date, user, userId) = (%s, %s, %d)" % (request.user.username, s.id, s.date, s.user.username, s.user.id))
+  logger.info("Superuser (%s) deleted subscription with ID %d (date, user, userId) = (%s, %s, %d)." % (request.user.username, s.id, s.date, s.user.username, s.user.id))
   s.delete()
 
   request.session.modified = True
@@ -278,6 +280,9 @@ def reformatDate(dtStr):
 
 
 def processUploadedPayments(xmlContents):
+  """
+  Parse e-banking payment records (XML transaction log).
+  """
   payments = []
   doc = xml.dom.minidom.parseString(xmlContents)
   trans = doc.getElementsByTagName("transactions")[0]
@@ -292,6 +297,9 @@ def processUploadedPayments(xmlContents):
 
 @login_required 
 def importEbankingFile(request):
+  """
+  Handle e-banking payments file (XML transaction log).
+  """
   if not request.user.is_superuser:
     return HttpResponse("user is not superuser!", status=403)
 
@@ -300,11 +308,11 @@ def importEbankingFile(request):
     if form.is_valid():
       try:
         payments = processUploadedPayments(form.cleaned_data["paymentsFile"].read())
-        PaymentFormSet = formset_factory(EBankingSubForm, extra=2, can_delete=True)
+        PaymentFormSet = formset_factory(EBankingSubForm, extra=2)
         formset = PaymentFormSet(initial=payments)
         return render_to_response('payments-from-file.html', {'username': request.user.username, 'formset': formset}, context_instance=RequestContext(request))
       except:
-        print "ERROR" # TODO sredi ovo
+        logger.error("Error while processing e-banking file!")
   else:
     form = EBankingUploadForm()
 
@@ -313,6 +321,9 @@ def importEbankingFile(request):
 
 @login_required 
 def importEbankingPayments(request):
+  """
+  Process e-banking payments (from web form data) and save subscriptions.
+  """
   if not request.user.is_superuser:
     return HttpResponse("user is not superuser!", status=403)
 
@@ -323,9 +334,8 @@ def importEbankingPayments(request):
       for frm in formset.forms:
         frm.save()
     else:
-      # TODO obraditi greske...
-      print "Invalid form!!"
-      print formset.errors
+      logger.error("Invalid e-banking payments form!")
+      return render_to_response('superuser-errors.html', {'errors': formset.errors}, context_instance=RequestContext(request))
 
     return redirect("superuser")
 

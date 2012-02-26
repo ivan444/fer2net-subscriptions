@@ -1,0 +1,53 @@
+{% load subs-tags %}
+<!-- The DOCTYPE declaration above will set the    -->
+<!-- browser's rendering engine into               -->
+<!-- "Standards Mode". Replacing this declaration  -->
+<!-- with a "Quirks Mode" doctype may lead to some -->
+<!-- differences in layout.                        -->
+
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <link type="text/css" rel="stylesheet" href="{% url templates "f2net-subs.css" %}">
+    <title>Fer2Net članarine</title>
+
+    <!--script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script-->
+    <script src="{% url js "jquery.js" %}" type="text/javascript"></script>	
+    <script src="{% url js "jquery.dataTables.min.js" %}" type="text/javascript"></script>	
+    <script src="{% url js "jquery.ui.core.js" %}" type="text/javascript"></script>	
+    <script src="{% url js "jquery.ui.widget.js" %}" type="text/javascript"></script>	
+    <script src="{% url js "jquery.ui.datepicker.js" %}" type="text/javascript"></script>	
+    <script type="text/javascript" src="{% url js "f2net-subs.js" %}"></script>
+    
+  </head>
+
+<body>
+    
+  <!-- web app will not function without JavaScript enabled -->
+  <noscript>
+    <div style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
+      Your web browser must have JavaScript enabled
+      in order for this application to display correctly.
+    </div>
+  </noscript>
+
+  {% if msg_info %}
+    <div class="info">{{ msg_info }}</div>
+  {% endif %}
+
+  {% if msg_warning %}
+    <div class="warning">{{ msg_warning }}</div>
+  {% endif %}
+
+  {% if msg_success %}
+    <div class="success">{{ msg_success }}</div>
+  {% endif %}
+
+  <h1>Hello {{ username }}!</h2>
+  <p>{{ errors }}</p>
+
+  <a href="{% url logout %}">Logout</a>
+
+  </body>
+</html>
+
