@@ -4,6 +4,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.db import connection
 from subscriptions.auth import VBULLETIN_CONFIG
+import settings
 from datetime import datetime, timedelta
 import logging
 
@@ -34,8 +35,9 @@ def activateMember(user):
 
   cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], VBULLETIN_CONFIG['paid_groupid'], user.id))
 
-  user.profile.subscribed = True
-  user.save()
+  if not user.profile.subscribed:
+    user.get_profile().subscribed = True
+    user.get_profile().save()
 
   logger.info("User with ID %d is now activated!" % (user.id,))
 
@@ -68,8 +70,8 @@ def deactivateMember(user):
           """
     cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], VBULLETIN_CONFIG['paid_groupid'], user.id))
 
-  user.profile.subscribed = False
-  user.save()
+  user.get_profile().subscribed = False
+  user.get_profile().save()
 
   logger.info("User with ID %d is now deactivated!" % (user.id,))
 
@@ -135,7 +137,9 @@ def fetchUser(uid):
 
     # Check if user is subscribed
     if row[2] == VBULLETIN_CONFIG['paid_groupid'] or VBULLETIN_CONFIG['paid_groupid'] in row[3].split(","):
-      user.profile.subscribed = True
+      if not user.profile.subscribed:
+        user.get_profile().subscribed = True
+        user.get_profile().save()
 
     # Process additional usergroups
     for groupid in row[3].split(','):
@@ -202,8 +206,7 @@ class EBankingSubForm(forms.Form):
 
   def save(self):
     if self.cleaned_data == {}: return None
-    # TODO: ovo ne mora biti točno!!! dodati u config? ebaniking_paymaster_id? bolje: hidden field forme - id trenutno logiranog korisnika
-    admin = User.objects.get(pk=1)
+    admin = fetchUser(settings.cfgEBPaymasterId)
 
     user = fetchUser(self.cleaned_data["userid"])
     if user == None:

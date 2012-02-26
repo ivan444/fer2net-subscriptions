@@ -23,6 +23,7 @@ cfgStandardGids = cfg.get("webconfig", "standard_groupids").split(",")
 cfgPaidGid = cfg.get("webconfig", "paid_groupid")
 cfgNotPaidGid = cfg.get("webconfig", "not_paid_groupid")
 cfgBannedGid = cfg.get("webconfig", "banned_groupid")
+cfgEBPaymasterId = cfg.getint("webconfig", "ebanking_paymaster_id")
 
 DEBUG = cfgDebug.lower() == "true"
 TEMPLATE_DEBUG = DEBUG

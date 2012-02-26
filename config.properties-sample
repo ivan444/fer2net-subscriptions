@@ -16,4 +16,5 @@ paid_groupid=191
 not_paid_groupid=192
 banned_groupid=8
 django-devserver=False
+ebanking_paymaster_id=1
 
