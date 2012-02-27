@@ -1,0 +1,555 @@
+﻿/*--------Global--------*/
+
+body{
+	margin:0;
+   	padding:0;
+   	height:100%;
+	background:url('images/bg.jpg');
+	background-position:left top;
+	background-repeat:repeat-x;
+	background-color:#efefef;
+}
+
+h1 {
+margin: 25px 0 15px 25px;
+font-size:18px;
+padding:0;
+color:white;
+}
+
+h2 {
+margin:20px 0px 5px 32px;
+font-size:18px;
+padding:0;
+color:white;
+font-weight:bold;
+}
+
+h3 {
+font-size:16px;
+padding:0;
+color:white;
+}
+
+/*--------Prijava--------*/
+#iznadprijave{
+	width:328px;
+	height:40px;
+	margin:80px auto 0px auto;
+	background-image:url('images/prijava.png');
+	background-position: left top;
+	background-repeat:no-repeat;
+}
+
+#strelica{
+	width:56px;
+	height:40px;
+	margin:0px 0px 0px 80px;
+	background-image:url('images/strelica.png');
+	background-position:left top;
+	background-repeat:no-repeat;
+}
+
+#prijava{
+	padding-top:8px;
+	margin:0px auto 0px auto;
+	width:326px;
+	height:174px;
+	border-left:1px #005d7b solid;
+	border-right:1px #005d7b solid;
+	background:#11a6d6;
+}
+
+#logo{
+	margin:0px 0px 20px 15px;
+	background-image:url('images/logo.jpg');
+	width:68px;
+	height:15px;
+	background-position:top left;
+	background-repeat:no-repeat;
+}
+
+#container-prijava{
+	width:262px;
+	height:30px;
+	margin:14px auto 6px auto;
+}
+
+#container-prijava-left{
+	float:left;
+	height:30px;
+	width:5px;
+	background-image:url('images/username-left.jpg');
+	background-position:left top;
+	background-repeat:no-repeat;
+}
+
+#container-prijava-mid{
+	float:left;
+	height:30px;
+	width:252px;
+}
+
+#container-prijava-right{
+	float:left;
+	height:30px;
+	width:5px;
+	background-image:url('images/username-right.jpg');
+	background-position:left top;
+	background-repeat:no-repeat;
+}
+
+input
+{
+height:30px;
+width:252px;
+color: black;
+background: #white;
+border-top:1px #005d7b solid;
+border-bottom:1px #005d7b solid;
+border-left:0px;
+border-right:0px;
+}
+
+.submit input
+{
+color: #000;
+background: #ffa20f;
+border: 2px outset #d7b9c9
+}
+
+#prijava-top{
+	background-image:url('images/prijava-top.png');
+	background-position:left top;
+	background-repeat:no-repeat;
+	width:328px;
+	height:6px;
+	margin:0px auto 0px auto;
+}
+
+#prijava-bottom{
+	background-image:url('images/prijava-bottom.png');
+	background-position:left top;
+	background-repeat:no-repeat;
+	width:328px;
+	height:6px;
+	margin:0px auto 0px auto;
+}
+
+/*--------Popis uplata----------*/
+
+#iznad-960{
+	width:690px;
+	height:40px;
+	margin:80px auto 0px auto;
+	background-image:url('images/popis-uplata.png');
+	background-repeat:no-repeat;
+	background-position:left top;
+}
+
+#popis-uplata{
+	width:56px;
+	height:40px;
+	margin:0px 0px 0px 130px;
+	background-image:url('images/strelica.png');
+	background-position:left top;
+	background-repeat:no-repeat;
+}
+
+#top-960{
+	background-image:url('images/690-top.png');
+	background-position:left top;
+	background-repeat:no-repeat;
+	width:690px;
+	height:6px;
+	margin:0px auto 0px auto;
+}
+
+#mid-960{
+	padding-top:9px;
+	margin:0px auto 0px auto;
+	width:688px;
+	height:auto;
+	border-left:1px #005d7b solid;
+	border-right:1px #005d7b solid;
+	background:#11a6d6;
+
+}
+
+#bottom-960{
+	background-image:url('images/690-bottom.png');
+	background-position:left top;
+	background-repeat:no-repeat;
+	width:690px;
+	height:6px;
+	margin:0px auto 0px auto;
+}
+
+#mid-traka-gore{
+	width:650px;
+	height:30px;
+	margin:-6px auto auto auto;
+}
+
+#logo2{
+	float:left;
+	background-image:url('images/logo2.jpg');
+	width:143px;
+	height:30px;
+	background-position:left top;
+	background-repeat:no-repeat;
+	margin-top:3px;
+}
+
+#user{
+	width:342px;
+	height:18px;
+	float:left;
+	color:white;
+	font-size:14px;
+	font-weight:bold;
+	text-align:right;
+	margin:8px 15px auto 0px;
+}
+
+#odjava-box{
+	float:left;
+	height:50px;
+	width:150px;
+}
+
+#lista-top{
+	background-image:url('images/570-top.png');
+	background-position:left top;
+	background-repeat:no-repeat;
+	width:570px;
+	height:6px;
+	margin:14px auto 0px auto;
+}
+
+#lista-mid{
+	background-color:white;
+	margin:0px auto 0px auto;
+	width:568px;
+	height:auto;
+	border-left:1px #005d7b solid;
+	border-right:1px #005d7b solid;
+	padding-bottom:4px;
+
+}
+
+#lista-bottom{
+	background-image:url('images/570-bottom.png');
+	background-position:left top;
+	background-repeat:no-repeat;
+	width:570px;
+	height:6px;
+	margin:0px auto 0px auto;
+}
+
+/*------statistike---------*/
+#container-960{
+	width:958px;
+	margin:0px auto auto auto;
+	border-left:1px #005d7b solid;
+	border-right:1px #005d7b solid;
+	background:#11a6d6;
+	padding-top:6px;
+}
+
+#iznad-container{
+	width:960px;
+	height:40px;
+	margin:40px auto 0px auto;
+	background-image:url('images/statistike.png');
+	background-repeat:no-repeat;
+	background-position:left top;
+}
+
+#statistike{
+	width:56px;
+	height:40px;
+	margin:0px 0px 0px 110px;
+	background-image:url('images/strelica.png');
+	background-position:left top;
+	background-repeat:no-repeat;
+}
+
+#iznad-container-staff{
+	width:960px;
+	height:40px;
+	margin:40px auto 0px auto;
+	background-image:url('images/staff.png');
+	background-repeat:no-repeat;
+	background-position:left top;
+}
+
+#staff{
+	width:56px;
+	height:40px;
+	margin:0px 0px 0px 68px;
+	background-image:url('images/strelica.png');
+	background-position:left top;
+	background-repeat:no-repeat;
+}
+
+#iznad-container-superuser{
+	width:960px;
+	height:40px;
+	margin:40px auto 0px auto;
+	background-image:url('images/superuser.png');
+	background-repeat:no-repeat;
+	background-position:left top;
+}
+
+#superuser{
+	width:56px;
+	height:40px;
+	margin:0px 0px 0px 100px;
+	background-image:url('images/strelica.png');
+	background-position:left top;
+	background-repeat:no-repeat;
+}
+
+
+#top-container-960{
+	background-image:url('images/960-top.png');
+	background-position:left top;
+	background-repeat:no-repeat;
+	width:960px;
+	height:6px;
+	margin:0px auto 0px auto;
+}
+
+#bottom-container-960{
+	background-image:url('images/960-bottom.png');
+	background-position:left top;
+	background-repeat:no-repeat;
+	width:960px;
+	height:6px;
+	margin:0px auto 0px auto;
+}
+
+#mid-traka-gore-960{
+	width:890px;
+	height:30px;
+	margin:0px auto 16px auto;
+}
+
+#logo2-960{
+	float:left;
+	background-image:url('images/logo2.jpg');
+	width:143px;
+	height:30px;
+	background-position:left top;
+	background-repeat:no-repeat;
+	margin-top:5px;
+}
+
+#user-960{
+	width:582px;
+	height:18px;
+	float:left;
+	color:white;
+	font-size:14px;
+	font-weight:bold;
+	text-align:right;
+	margin:8px 15px auto 0px;
+}
+
+#superuser-960{
+	width:132px;
+	height:18px;
+	float:left;
+	color:white;
+	font-size:14px;
+	font-weight:bold;
+	text-align:right;
+	margin:8px 15px auto 0px;
+}
+
+
+#odjava-box-960{
+	float:left;
+	height:50px;
+	width:150px;
+}
+
+#top-890{
+	margin:0px auto auto auto;
+	width:890px;
+	height:6px;
+	background-image:url('images/890-top.png');
+	background-position:left top;
+	background-repeat:no-repeat;
+}
+
+#mid-890{
+	background-color:white;
+	margin:-2px auto 0px auto;
+	width:880px;
+	height:auto;
+	border-left:1px #005d7b solid;
+	border-right:1px #005d7b solid;
+	padding-bottom:18px;
+	padding-left:4px;
+	padding-right:4px;
+
+}
+
+#mid-890-static{
+	background-color:white;
+	margin:-2px auto 0px auto;
+	width:888px;
+	height:auto;
+	border-left:1px #005d7b solid;
+	border-right:1px #005d7b solid;
+	padding-bottom:0px;
+}
+
+#bottom-890{
+	margin:0px auto auto auto;
+	width:890px;
+	height:6px;
+	background-image:url('images/890-bottom.png');
+	background-position:left top;
+	background-repeat:no-repeat;
+}
+
+/*-------footer--------*/
+
+#footer{
+	width:960px;
+	height:20px;
+	margin:10px auto auto auto;
+	color:#005d7b;
+	text-align:center;
+}
+
+
+/*--------Gumb-----------*/
+
+button.minimal {
+	float:right;
+	background: #73cff1;
+	border: 1px solid #005d7b;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	-ms-border-radius: 3px;
+	-o-border-radius: 3px;
+	border-radius: 3px;
+	-webkit-box-shadow: inset 0 0 1px 1px #95ddf7;
+	-moz-box-shadow: inset 0 0 1px 1px #95ddf7;
+	-ms-box-shadow: inset 0 0 1px 1px #95ddf7;
+	-o-box-shadow: inset 0 0 1px 1px #95ddf7;
+	box-shadow: inset 0 0 1px 1px #95ddf7;
+	color: #333;
+	font: bold 12px tahoma, helvetica, arial, sans-serif;
+	line-height: 1;
+	padding: 8px 0 9px;
+	text-align: center;
+	text-shadow: 0 1px 0 #a4dcf1;
+	width: 150px; }
+  
+button.minimal:hover 
+{
+    background: #b5e7f9;
+    -webkit-box-shadow: inset 0 0 1px 1px #d6f4ff;
+    -moz-box-shadow: inset 0 0 1px 1px #d6f4ff;
+    -ms-box-shadow: inset 0 0 1px 1px #d6f4ff;
+    -o-box-shadow: inset 0 0 1px 1px #d6f4ff;
+    box-shadow: inset 0 0 1px 1px #d6f4ff;
+    color: #222;
+	cursor: pointer; 
+}
+   
+button.minimal:active {
+	background: #8cd6f2;
+	-webkit-box-shadow: inset 0 0 1px 1px #ace9ff;
+	-moz-box-shadow: inset 0 0 1px 1px #ace9ff;
+	-ms-box-shadow: inset 0 0 1px 1px #ace9ff;
+	-o-box-shadow: inset 0 0 1px 1px #ace9ff;
+	box-shadow: inset 0 0 1px 1px #ace9ff;
+	color: #000; 
+}
+
+button.minimal2 {
+	background: #73cff1;
+	border: 1px solid #005d7b;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	-ms-border-radius: 3px;
+	-o-border-radius: 3px;
+	border-radius: 3px;
+	-webkit-box-shadow: inset 0 0 1px 1px #95ddf7;
+	-moz-box-shadow: inset 0 0 1px 1px #95ddf7;
+	-ms-box-shadow: inset 0 0 1px 1px #95ddf7;
+	-o-box-shadow: inset 0 0 1px 1px #95ddf7;
+	box-shadow: inset 0 0 1px 1px #95ddf7;
+	color: #333;
+	font: bold 12px tahoma, helvetica, arial, sans-serif;
+	line-height: 1;
+	padding: 8px 0 9px;
+	text-align: center;
+	text-shadow: 0 1px 0 #a4dcf1;
+	width: 80px; }
+  
+button.minimal2:hover 
+{
+    background: #b5e7f9;
+    -webkit-box-shadow: inset 0 0 1px 1px #d6f4ff;
+    -moz-box-shadow: inset 0 0 1px 1px #d6f4ff;
+    -ms-box-shadow: inset 0 0 1px 1px #d6f4ff;
+    -o-box-shadow: inset 0 0 1px 1px #d6f4ff;
+    box-shadow: inset 0 0 1px 1px #d6f4ff;
+    color: #222;
+	cursor: pointer; 
+}
+   
+button.minimal2:active {
+	background: #8cd6f2;
+	-webkit-box-shadow: inset 0 0 1px 1px #ace9ff;
+	-moz-box-shadow: inset 0 0 1px 1px #ace9ff;
+	-ms-box-shadow: inset 0 0 1px 1px #ace9ff;
+	-o-box-shadow: inset 0 0 1px 1px #ace9ff;
+	box-shadow: inset 0 0 1px 1px #ace9ff;
+	color: #000; 
+}
+
+ul{
+}
+
+li{	
+	margin-left:40px;
+	padding:12px;
+	color:#111111;
+	font-size:14px;
+}
+
+.info, .success, .warning, .error, .validation {
+  border: 1px solid;
+  margin: 10px 0px;
+  padding:15px 10px 15px 50px;
+  background-repeat: no-repeat;
+  background-position: 10px center;
+}
+.info {
+  color: #00529B;
+  background-color: #BDE5F8;
+  background-image: url('images/info.png');
+}
+.success {
+  color: #4F8A10;
+  background-color: #DFF2BF;
+  background-image:url('images/success.png');
+}
+.warning {
+  color: #9F6000;
+  background-color: #FEEFB3;
+  background-image: url('images/warning.png');
+}
+.error {
+  color: #D8000C;
+  background-color: #FFBABA;
+  background-image: url('images/error.png');
+}

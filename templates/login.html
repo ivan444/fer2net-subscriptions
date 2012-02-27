@@ -1,27 +1,50 @@
 {% extends "base.html" %}
 
-{% block content %}
+{% block title-extra %} / Prijava {% endblock %}
+
+{% block body %}
 
 {% if wrong_login %}
 <p>Your username and password didn't match. Please try again.</p>
 {% endif %}
 
-<form method="post" action="{% url loginview %}">
-{% csrf_token %}
-<table>
-<tr>
-    <td>E-mail:</td>
-    <td><input type="text" name="username" /></td>
-</tr>
-<tr>
-    <td>Password:</td>
-    <td><input type="password" name="password" /></td>
-</tr>
-</table>
+<div id="iznadprijave"><div id="strelica"></div></div>
+<div id="prijava-top"></div>
 
-<input type="hidden" name="next" value="{{ next }}" />
-<input type="submit" value="login" />
+<div id="prijava">
+<div id="logo"></div>
+<form method="post" action="{% url loginview %}">
+  {% csrf_token %}
+  <div id="container-prijava">
+    <div id="container-prijava-left"></div>
+	
+    <div id="container-prijava-mid">
+      <input style="height:26px" type="text" name="username" value="E-mail" onblur="if (this.value == '') {this.value = 'E-mail';}" onfocus="if (this.value = '') {this.value = '';}">
+    </div>
+	
+    <div id="container-prijava-right"></div>
+  </div>
+
+  <div id="container-prijava">
+    <div id="container-prijava-left"></div>
+	
+    <div id="container-prijava-mid">
+      <input style="height:26px" type="password" name="password" value="Lozinka" onblur="if (this.value == '') {this.value = 'Lozinka';}" onfocus="if (this.value = '') {this.value = '';}">
+    </div>
+	
+    <div id="container-prijava-right"></div>
+  </div>
+
+  <div id="container-prijava">
+    <input name="next" value="{{ next }}" type="hidden">
+    <!--input type="submit" value="Prijava" class="minimal" /-->
+    <button type="submit" class="minimal">Prijava</button>
+  </div>
+
 </form>
 
+</div>
+
+<div id="prijava-bottom"></div>
 {% endblock %}
 
