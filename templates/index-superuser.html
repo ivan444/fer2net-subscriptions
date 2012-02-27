@@ -2,7 +2,7 @@
 
 {% load subs-tags %}
 
-{% block title-extra %} / Član {% endblock %}
+{% block title-extra %} / Superuser {% endblock %}
 
 {% block extra-css %}
   <link type="text/css" rel="stylesheet" href="{% url templates "demo_page.css" %}">
@@ -71,6 +71,7 @@
 		<div id="odjava-box-960"><a href="{% url staff %}"><button class="minimal">Staff page</button></a></div>
 		<div id="odjava-box-960"><a href="{% url member %}"><button class="minimal">Member page</button></a></div>
 		<div id="odjava-box-960"><a href="{% url ebanking_payment %}"><button class="minimal">Upload XML</button></a></div>
+		<div id="odjava-box-960"><a href="{% url stats %}"><button class="minimal">Statistike</button></a></div>
 		<div id="odjava-box-960"><a href="{% url logout %}"><button class="minimal">Odjava</button></a></div>
 </div>
 

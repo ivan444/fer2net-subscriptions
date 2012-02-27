@@ -1,38 +1,40 @@
-<!doctype html>
-<!-- The DOCTYPE declaration above will set the    -->
-<!-- browser's rendering engine into               -->
-<!-- "Standards Mode". Replacing this declaration  -->
-<!-- with a "Quirks Mode" doctype may lead to some -->
-<!-- differences in layout.                        -->
+{% extends "base.html" %}
 
-<html>
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <link type="text/css" rel="stylesheet" href="{% url templates "f2net-subs.css" %}">
-    <title>Fer2Net članarine</title>
+{% block title-extra %} / Member {% endblock %}
 
-    <!--script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script-->
-    <script src="{% url js "jquery.js" %}" type="text/javascript"></script>	
-    <script type="text/javascript" src="{% url js "f2net-subs.js" %}"></script>
-    
-  </head>
+{% block content %}
+<div id="iznad-960">
+<div id="popis-uplata"></div>
+</div>
 
-<body>
-    
-  <img src="{% url images "knob_message.png" %}" />
-  <h2>{{ username }}</h2>
+<div id="top-960"></div>
+<div id="mid-960">
+	
+	<div id="mid-traka-gore">
+		<div id="logo2"></div>
+    <div id="user">Dobrodošli, <i>{{ username }}</i></div>
+		<div id="odjava-box"><a href="{% url stats %}"><button class="minimal">Statistike</button></a></div>
+		<div id="odjava-box"><a href="{% url logout %}"><button class="minimal">Odjava</button></a></div>
+		<!--div id="odjava-box"><a href="http://localhost:8000/logout"><button class="minimal">Odjava</button></a></div-->
+	</div>
+	
+	<div id="lista-top"></div>
+	<div id="lista-mid">
   <table border="1">
     <tr><td>Datum uplate</td><td>Datum isteka</td><td>Izvršitelj uplate</td></tr>
     {% for s in subs %}
     <tr>
       <td>{{ s.date }}</td>
-      <td>{{ s.subsEnd|date:"D d M Y" }}</td>
+      <td>{{ s.subsEnd|date:"m.Y." }}</td>
       <td>{{ s.paymaster.username }}</td>
     </tr>
     {% endfor %}
   </table>
-  <a href="{% url logout %}">Logout</a>
-
-  </body>
-</html>
+	</div>
+	<div id="lista-bottom"></div>
+<br>
+<br>
+</div>
+<div id="bottom-960"></div>
+{% endblock %}
 

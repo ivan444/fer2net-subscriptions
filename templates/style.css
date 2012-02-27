@@ -213,7 +213,7 @@ border: 2px outset #d7b9c9
 }
 
 #user{
-	width:342px;
+	width:222px;
 	height:18px;
 	float:left;
 	color:white;
@@ -226,7 +226,7 @@ border: 2px outset #d7b9c9
 #odjava-box{
 	float:left;
 	height:50px;
-	width:150px;
+	width:130px;
 }
 
 #lista-top{
@@ -350,7 +350,7 @@ border: 2px outset #d7b9c9
 #logo2-960{
 	float:left;
 	background-image:url('images/logo2.jpg');
-	width:143px;
+	width:93px;
 	height:30px;
 	background-position:left top;
 	background-repeat:no-repeat;
@@ -383,7 +383,7 @@ border: 2px outset #d7b9c9
 #odjava-box-960{
 	float:left;
 	height:50px;
-	width:150px;
+	width:130px;
 }
 
 #top-890{
@@ -460,7 +460,7 @@ button.minimal {
 	padding: 8px 0 9px;
 	text-align: center;
 	text-shadow: 0 1px 0 #a4dcf1;
-	width: 150px; }
+	width: 130px; }
   
 button.minimal:hover 
 {
