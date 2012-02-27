@@ -34,7 +34,7 @@ def indexMember(request):
 
 
 @login_required 
-def indexSuperuser(request):
+def indexSuperuser(request, msg_info=None):
   if not request.user.is_superuser:
     return HttpResponse("user is not superuser!", status=403)
 
@@ -48,7 +48,7 @@ def indexSuperuser(request):
   subs = Subscription.objects.order_by('-date').all()
   bills = Bill.objects.order_by('-date').all()
 
-  return render_to_response('index-superuser.html', {'username': request.user.username, 'allSubs': subs, 'bill_form': form, 'allBills': bills, 'billTypes': Bill.BILL_TYPES_DICT}, context_instance=RequestContext(request))
+  return render_to_response('index-superuser.html', {'msg_info':msg_info, 'username': request.user.username, 'allSubs': subs, 'bill_form': form, 'allBills': bills, 'billTypes': Bill.BILL_TYPES_DICT}, context_instance=RequestContext(request))
 
 
 @login_required 
@@ -66,7 +66,7 @@ def indexStaff(request):
   for r in rows:
     usr = {}
     usr["userid"] = r[0]
-    if r[1] == VBULLETIN_CONFIG['paid_groupid'] or VBULLETIN_CONFIG['paid_groupid'] in r[2]:
+    if r[1] == int(VBULLETIN_CONFIG['paid_groupid']) or VBULLETIN_CONFIG['paid_groupid'] in r[2].split(","):
       usr["valid"] = True
     else:
       usr["valid"] = False
@@ -290,7 +290,11 @@ def processUploadedPayments(xmlContents):
     p = {}
     p["date"] = reformatDate(t.getAttribute("date"))
     p["userid"] = desc = t.getAttribute("description")
-    p["amount"] = t.getElementsByTagName("receive")[0].getAttribute("amount")
+    amount = t.getElementsByTagName("receive")[0].getAttribute("amount")
+    if "," in amount:
+      p["amount"] = amount.split(",")[0]
+    else:
+      p["amount"] = "0"
     payments.append(p)
   return payments
 
@@ -303,6 +307,8 @@ def importEbankingFile(request):
   if not request.user.is_superuser:
     return HttpResponse("user is not superuser!", status=403)
 
+  msg_warning = None
+
   if request.method == "POST":
     form = EBankingUploadForm(request.POST, request.FILES)
     if form.is_valid():
@@ -311,12 +317,13 @@ def importEbankingFile(request):
         PaymentFormSet = formset_factory(EBankingSubForm, extra=2)
         formset = PaymentFormSet(initial=payments)
         return render_to_response('payments-from-file.html', {'username': request.user.username, 'formset': formset}, context_instance=RequestContext(request))
-      except:
-        logger.error("Error while processing e-banking file!")
+      except Exception as e:
+        msg_warning = "Error while processing e-banking file!"
+        logger.error(msg_warning + "\n" + str(e))
   else:
     form = EBankingUploadForm()
 
-  return render_to_response('payments-file.html', {'username': request.user.username, 'upload_form': form}, context_instance=RequestContext(request))
+  return render_to_response('payments-file.html', {'username': request.user.username, 'upload_form': form, 'msg_warning': msg_warning}, context_instance=RequestContext(request))
 
 
 @login_required 
@@ -327,17 +334,30 @@ def importEbankingPayments(request):
   if not request.user.is_superuser:
     return HttpResponse("user is not superuser!", status=403)
 
+  msgInfo = "<ul>"
   if request.method == "POST":
     PaymentFormSet = formset_factory(EBankingSubForm)
     formset = PaymentFormSet(request.POST)
-    if formset.is_valid():
-      for frm in formset.forms:
-        frm.save()
-    else:
-      logger.error("Invalid e-banking payments form!")
-      return render_to_response('superuser-errors.html', {'errors': formset.errors}, context_instance=RequestContext(request))
+    #if formset.is_valid():
+    for frm in formset.forms:
+      if frm.is_valid():
+        ret = frm.save()
+        if ret == None:
+          logger.warn("Payment (uid = %s) skipped!" % (frm,))
+          msgInfo += "<li>Payment skipped!</li>"
+        else:
+          logger.info("Payment (uid = %s) processed!" % (frm,))
+          msgInfo += "<li>Payment processed!</li>"
 
-    return redirect("superuser")
+      else:
+        logger.error("Invalid e-banking payments form!")
+        msgInfo += "<li>Payment invalid!</li>"
+      #  return render_to_response('payments-from-file.html', {'username': request.user.username, 'formset': formset}, context_instance=RequestContext(request))
+      #return render_to_response('superuser-errors.html', {'errors': formset.errors}, context_instance=RequestContext(request))
+
+    msgInfo += "</ul>"
+
+    return indexSuperuser(request, msgInfo)
 
   else:
     return redirect("ebanking_payment")

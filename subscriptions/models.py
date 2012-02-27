@@ -2,7 +2,7 @@
 from django.db import models
 from django import forms
 from django.contrib.auth.models import User
-from django.db import connection
+from django.db import connection, transaction
 from subscriptions.auth import VBULLETIN_CONFIG
 import settings
 from datetime import datetime, timedelta
@@ -34,6 +34,7 @@ def activateMember(user):
           """
 
   cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], VBULLETIN_CONFIG['paid_groupid'], user.id))
+  transaction.commit_unless_managed()
 
   if not user.profile.subscribed:
     user.get_profile().subscribed = True
@@ -69,33 +70,39 @@ def deactivateMember(user):
              WHERE userid = %s
           """
     cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], VBULLETIN_CONFIG['paid_groupid'], user.id))
+    transaction.commit_unless_managed()
 
-  user.get_profile().subscribed = False
-  user.get_profile().save()
+  if user.profile.subscribed:
+    user.get_profile().subscribed = False
+    user.get_profile().save()
 
   logger.info("User with ID %d is now deactivated!" % (user.id,))
 
 
 def usergroupid(user):
   """
-  Returns usergroupid of given user.
+  Returns usergroupid of given user, or -1 if user doesn't exist.
   """
   cursor = connection.cursor()
-  cursor.execute("""SELECT usergroupid FROM %suser WHERE userid = %s"""
-                 % (VBULLETIN_CONFIG['tableprefix'], user.id))
+  cursor.execute("""SELECT usergroupid FROM %suser WHERE userid = %s""" % (VBULLETIN_CONFIG['tableprefix'], user.id))
   row = cursor.fetchone()
-  return int(row[0])
+  if row:
+    return int(row[0])
+  else:
+    return -1
 
 
 def userbannedgroupid(user):
   """
-  Returns usergroupid of given user who is banned.
+  Returns usergroupid of given user who is banned, or -1 if user isn't banned.
   """
   cursor = connection.cursor()
-  cursor.execute("""SELECT usergroupid FROM %suserban WHERE userid = %s"""
-  % (VBULLETIN_CONFIG['tableprefix'], user.id))
+  cursor.execute("""SELECT usergroupid FROM %suserban WHERE userid = %s""" % (VBULLETIN_CONFIG['tableprefix'], user.id))
   row = cursor.fetchone()
-  return int(row[0])
+  if row:
+    return int(row[0])
+  else:
+    return -1
 
 
 class UserProfile(models.Model):

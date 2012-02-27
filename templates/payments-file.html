@@ -20,6 +20,10 @@
 <body>
     
   <img src="{% url images "knob_message.png" %}" />
+  {% if msg_warning %}
+    <div class="warning">{{ msg_warning }}</div>
+  {% endif %}
+
   <h2>{{ username }}</h2>
   <form action="{% url ebanking_payment %}" method="POST" enctype="multipart/form-data">
     {% csrf_token %}

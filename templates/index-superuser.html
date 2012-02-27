@@ -73,7 +73,7 @@
   </noscript>
 
   {% if msg_info %}
-    <div class="info">{{ msg_info }}</div>
+    <div class="info">{{ msg_info|safe }}</div>
   {% endif %}
 
   {% if msg_warning %}
