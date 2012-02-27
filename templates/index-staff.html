@@ -1,24 +1,15 @@
-<!DOCTYPE html>
-<!-- The DOCTYPE declaration above will set the    -->
-<!-- browser's rendering engine into               -->
-<!-- "Standards Mode". Replacing this declaration  -->
-<!-- with a "Quirks Mode" doctype may lead to some -->
-<!-- differences in layout.                        -->
+{% extends "base.html" %}
 
-<html>
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <link type="text/css" rel="stylesheet" href="{% url templates "f2net-subs.css" %}">
-    <link type="text/css" rel="stylesheet" href="{% url templates "demo_page.css" %}">
-    <link type="text/css" rel="stylesheet" href="{% url templates "demo_table.css" %}">
-    <link type="text/css" rel="stylesheet" href="{% url templates "demo_table_jui.css" %}">
-    <title>Fer2Net članarine</title>
+{% block title-extra %} / Staff {% endblock %}
 
-    <!--script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script-->
-    <script src="{% url js "jquery.js" %}" type="text/javascript"></script>	
-    <script src="{% url js "jquery.dataTables.min.js" %}" type="text/javascript"></script>	
-    <script type="text/javascript" src="{% url js "f2net-subs.js" %}"></script>
+{% block extra-css %}
+  <link type="text/css" rel="stylesheet" href="{% url templates "demo_page.css" %}">
+  <link type="text/css" rel="stylesheet" href="{% url templates "demo_table.css" %}">
+  <link type="text/css" rel="stylesheet" href="{% url templates "demo_table_jui.css" %}">
+{% endblock %}
 
+{% block extra-js %}
+  <script src="{% url js "jquery.dataTables.min.js" %}" type="text/javascript"></script>	
   <script type="text/javascript">
 
     function confirmPayment(uid) {
@@ -75,38 +66,38 @@
 
   </script>
 	<!-- End JS -->
+{% endblock %}
     
-  </head>
-
-<body>
-<script type="text/javascript">
 {% block start-scripts %}
+<script type="text/javascript">
   $(document).ready(function() {
     $('#users').dataTable();
     $('#def_amount_val').change(updateAmount);
   });
-{% endblock %}
 </script>
-    
-  <!-- web app will not function without JavaScript enabled -->
-  <noscript>
-    <div style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
-      Your web browser must have JavaScript enabled
-      in order for this application to display correctly.
-    </div>
-  </noscript>
+{% endblock %}
 
-  {% if msg_info %}
-    <div class="info">{{ msg_info }}</div>
-  {% endif %}
+{% block content %}
+<div id="iznad-container-staff">
+<div id="staff"></div>
+</div>
 
-  {% if msg_warning %}
-    <div class="warning">{{ msg_warning }}</div>
-  {% endif %}
+<div id="top-container-960"></div>
 
-  {% if msg_success %}
-    <div class="success">{{ msg_success }}</div>
-  {% endif %}
+<div id="container-960">
+
+<div id="mid-traka-gore-960">
+		<div id="logo2-960"></div>
+		<div id="user-960">Dobrodošli, <i>{{ username }}</i></div>
+
+		<div id="odjava-box-960"><a href="{% url member %}"><button class="minimal">Member page</button></a></div>
+		<div id="odjava-box-960"><a href="{% url stats %}"><button class="minimal">Statistike</button></a></div>
+		<div id="odjava-box-960"><a href="{% url logout %}"><button class="minimal">Odjava</button></a></div>
+	</div>
+
+<div id="top-890"></div>
+  
+  <div id="mid-890">
 
   <div id="def_amount">Default amount: <input id="def_amount_val" type="text" size="4" value="30" /></div>
   <table id="users" cellpadding="0" cellspacing="0" border="0" class="display">
@@ -128,15 +119,20 @@
           <td id="expr_days_{{ u.userid }}">{{ u.sub_expr }}</td>
           <td>{{ u.username }}</td>
           <td><input id="amount_{{ u.userid }}" type="text" size="4" value="30" /></td>
-          <td><input id="paymentBtn_{{ u.userid }}"{% if u.valid %} disabled="true"{% endif %} type="button" value="Uplati" onclick="makePayment('{{ u.userid }}', $('#amount_{{ u.userid }}').val())" /></td>
-          <td><input id="delayBtn_{{ u.userid }}"{% if u.valid %} disabled="true"{% endif %} type="button" value="Odgoda" onclick="makePayment('{{ u.userid }}', '0')" /></td>
-          <td><input id="deleteBtn_{{ u.userid }}"{% if not u.valid %} disabled="true"{% endif %} type="button" value="Obriši" onclick="deletePayment('{{ u.userid }}')" /></td>
+          <td><input id="paymentBtn_{{ u.userid }}" class="actionBtn" {% if u.valid %} disabled="true"{% endif %} type="button" value="Uplati" onclick="makePayment('{{ u.userid }}', $('#amount_{{ u.userid }}').val())" /></td>
+          <td><input id="delayBtn_{{ u.userid }}" class="actionBtn" {% if u.valid %} disabled="true"{% endif %} type="button" value="Odgoda" onclick="makePayment('{{ u.userid }}', '0')" /></td>
+          <td><input id="deleteBtn_{{ u.userid }}" class="actionBtn" {% if not u.valid %} disabled="true"{% endif %} type="button" value="Obriši" onclick="deletePayment('{{ u.userid }}')" /></td>
         </tr>
       {% endfor %}
     </tbody>
   </table>
-  <a href="{% url logout %}">Logout</a>
+</div>
+<div id="bottom-890"></div>
+<br><br>
+	</div>
+	
+	
+<div id="bottom-container-960"></div>
 
-  </body>
-</html>
+{% endblock %}
 

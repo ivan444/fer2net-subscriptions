@@ -1,93 +1,102 @@
+{% extends "base.html" %}
+
 {% load subs-tags %}
-<!doctype html>
-<!-- The DOCTYPE declaration above will set the    -->
-<!-- browser's rendering engine into               -->
-<!-- "Standards Mode". Replacing this declaration  -->
-<!-- with a "Quirks Mode" doctype may lead to some -->
-<!-- differences in layout.                        -->
 
-<html>
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <link type="text/css" rel="stylesheet" href="{% url templates "f2net-subs.css" %}">
-    <link type="text/css" rel="stylesheet" href="{% url templates "demo_page.css" %}">
-    <link type="text/css" rel="stylesheet" href="{% url templates "demo_table.css" %}">
-    <link type="text/css" rel="stylesheet" href="{% url templates "demo_table_jui.css" %}">
-    <title>Fer2Net članarine</title>
+{% block title-extra %} / Statistike {% endblock %}
 
-    <!--script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script-->
-    <script src="{% url js "jquery.js" %}" type="text/javascript"></script>	
-    <script src="{% url js "jquery.dataTables.min.js" %}" type="text/javascript"></script>	
-    <script type="text/javascript" src="{% url js "f2net-subs.js" %}"></script>
+{% block extra-css %}
+  <link type="text/css" rel="stylesheet" href="{% url templates "demo_page.css" %}">
+  <link type="text/css" rel="stylesheet" href="{% url templates "demo_table.css" %}">
+  <link type="text/css" rel="stylesheet" href="{% url templates "demo_table_jui.css" %}">
+{% endblock %}
+
+{% block extra-js %}
+  <script src="{% url js "jquery.dataTables.min.js" %}" type="text/javascript"></script>	
+{% endblock %}
 
   </head>
 
 <body>
-<script type="text/javascript">
 {% block start-scripts %}
+<script type="text/javascript">
   $(document).ready(function() {
     $('#byyear').dataTable();
     $('#bills').dataTable();
   });
-{% endblock %}
 </script>
+{% endblock %}
     
-  <!-- web app will not function without JavaScript enabled -->
-  <noscript>
-    <div style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
-      Your web browser must have JavaScript enabled
-      in order for this application to dis
-      
-lay correctly.
-    </div>
-  </noscript>
 
-  {% if msg_info %}
-    <div class="info">{{ msg_info }}</div>
-  {% endif %}
+{% block content %}
+<div id="iznad-container">
+<div id="statistike"></div>
+</div>
 
-  {% if msg_warning %}
-    <div class="warning">{{ msg_warning }}</div>
-  {% endif %}
+<div id="top-container-960"></div>
 
-  {% if msg_success %}
-    <div class="success">{{ msg_success }}</div>
-  {% endif %}
+<div id="container-960">
 
-  <h1>Hello {{ request.user.username }}!</h1>
+	<div id="mid-traka-gore-960">
+		<div id="logo2-960"></div>
+    <div id="superuser-960">Dobrodišli, <i>{{ request.user.username }}!</i></div>
 
-  <table id="totals" cellpadding="0" cellspacing="0" border="1" class="display">
-    <thead>
-      <tr>
-        <td style="width: 75%">Opis</td>
-        <td>Iznos [kn]</td>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Ukupno uplaćeno</td>
-        <td>{{ totalAmount }}</td>
-      </tr>
-      <tr>
-        <td>Ukupno uplaćeno (uživo)</td>
-        <td>{{ totalInPerson }}</td>
-      </tr>
-      <tr>
-        <td>Ukupno uplaćeno (e-banking)</td>
-        <td>{{ totalEBanking }}</td>
-      </tr>
-      <tr>
-        <td>Ukupno potrošeno</td>
-        <td>{{ totalExpense }}</td>
-      </tr>
-      <tr>
-        <td>Ukupno uplata</td>
-        <td>{{ numberOfPayments }}</td>
-      </tr>
-    </tbody>
-  </table>
+    {% if request.user.is_superuser %}
+      <div id="odjava-box-960"><a href="{% url superuser %}"><button class="minimal">Superuser page</button></a></div>
+    {% endif %}
+    {% if request.user.is_staff %}
+      <div id="odjava-box-960"><a href="{% url staff %}"><button class="minimal">Staff page</button></a></div>
+    {% endif %}
+		<div id="odjava-box-960"><a href="{% url member %}"><button class="minimal">Member page</button></a></div>
+		<div id="odjava-box-960"><a href="{% url stats %}"><button class="minimal">Statistike</button></a></div>
+		<div id="odjava-box-960"><a href="{% url logout %}"><button class="minimal">Odjava</button></a></div>
+	</div>
 
-<br />
+	<div id="top-890"></div>
+	
+	
+  <div id="mid-890-static">
+    <table id="totals" cellpadding="0" cellspacing="0" border="1" class="display">
+      <thead>
+        <tr style="font-weight:bolder;">
+          <td style="width: 75%">Opis</td>
+          <td>Iznos [kn]</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="background:#ebebeb;">
+          <td>Ukupno uplaćeno</td>
+          <td>{{ totalAmount }}</td>
+        </tr>
+        <tr>
+          <td>Ukupno uplaćeno (uživo)</td>
+          <td>{{ totalInPerson }}</td>
+        </tr>
+        <tr style="background:#ebebeb;">
+          <td>Ukupno uplaćeno (e-banking)</td>
+          <td>{{ totalEBanking }}</td>
+        </tr>
+        <tr>
+          <td>Ukupno potrošeno</td>
+          <td>{{ totalExpense }}</td>
+        </tr>
+        <tr style="background:#ebebeb;">
+          <td>Ukupno uplata</td>
+          <td>{{ numberOfPayments }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+	
+  <div id="bottom-890"></div>
+
+  <h2>Statistike</h2>
+  <div id="top-890"></div>
+  
+  <div id="mid-890">
+  
+  <br />
+
+  <!-- možda width: 880px -->
   <table id="byyear" cellpadding="0" cellspacing="0" border="0" class="display">
     <thead>
       <tr>
@@ -113,8 +122,16 @@ lay correctly.
     </tbody>
   </table>
 
+  </div>
+  <div id="bottom-890"></div>
+
+  <br/>
+
   {% if request.user.is_staff %}
   <h2>Računi (staff only!)</h2>
+  <div id="top-890"></div>
+  <div id="mid-890">
+
   <table id="bills" cellpadding="0" cellspacing="0" border="0" class="display">
     <thead>
       <tr>
@@ -139,10 +156,15 @@ lay correctly.
       {% endfor %}
     </tbody>
   </table>
+  </div>
+  
+  <div id="bottom-890"></div>
   {% endif %}
 
-  <a href="{% url logout %}">Logout</a>
+  <br/>
+  </div>
 
-  </body>
-</html>
+  <div id="bottom-container-960"></div>
+
+{% endblock %}
 

@@ -357,8 +357,22 @@ border: 2px outset #d7b9c9
 	margin-top:5px;
 }
 
+.actionBtn:hover {
+  background: #D3D6FF;
+}
+
+.actionBtn {
+  cursor: pointer;
+}
+
+input[disabled] {
+  border: 1px solid #999;
+  background-color: #ddd;
+  cursor: not-allowed;
+}
+
 #user-960{
-	width:582px;
+	width:392px;
 	height:18px;
 	float:left;
 	color:white;
