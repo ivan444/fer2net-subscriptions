@@ -32,15 +32,14 @@
         $.ajax({
           url: '{% url superuser_delete_payment %}/'+sid,
           error: function(jqXHR, textStatus, errorThrown) {
-            alert("Error!\n" + jqXHR + "\n" + textStatus + "\n" + errorThrown); // TODO: humanize error
+            //alert("Error!\n" + jqXHR + "\n" + textStatus + "\n" + errorThrown); // TODO: humanize error
           },
           statusCode: {
             404: function() {
-              alert('Uplata ne postoji ili nemate dopuštenje za brisanje uplate.');
+              alert('Uplata ne postoji.');
             }
           },
           success: function(data) {
-            alert('Done!');
             $('#' + sid).remove();
           }
         });

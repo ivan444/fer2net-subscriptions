@@ -29,7 +29,7 @@ def index(request):
 
 @login_required 
 def indexMember(request):
-  subs = Subscription.objects.filter(user__id = request.user.id).order_by('-date').all()
+  subs = Subscription.objects.filter(user__id = request.user.id).filter(valid=True).order_by('-date').all()
   return render_to_response('index-member.html', {'username': request.user.username, 'subs': subs})
 
 
