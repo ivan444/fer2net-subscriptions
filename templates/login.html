@@ -2,11 +2,7 @@
 
 {% block title-extra %} / Prijava {% endblock %}
 
-{% block body %}
-
-{% if wrong_login %}
-<p>Your username and password didn't match. Please try again.</p>
-{% endif %}
+{% block content %}
 
 <div id="iznadprijave"><div id="strelica"></div></div>
 <div id="prijava-top"></div>
@@ -37,7 +33,6 @@
 
   <div id="container-prijava">
     <input name="next" value="{{ next }}" type="hidden">
-    <!--input type="submit" value="Prijava" class="minimal" /-->
     <button type="submit" class="minimal">Prijava</button>
   </div>
 

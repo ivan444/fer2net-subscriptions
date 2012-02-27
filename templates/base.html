@@ -11,11 +11,21 @@
 
   <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
   {% block extra-js %}{% endblock %}
-  <script type="text/javascript" src="{% url js "f2net-subs.js" %}"></script>
     
 </head>
 
 <body>
+{% block start-scripts %}
+{% endblock %}
+
+  <!-- web app will not function without JavaScript enabled -->
+  <noscript>
+    <div style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
+      Your web browser must have JavaScript enabled
+      in order for this application to display correctly.
+    </div>
+  </noscript>
+
 {% if msg_info %}
   <div class="info">{{ msg_info|safe }}</div>
 {% endif %}
@@ -28,42 +38,11 @@
   <div class="success">{{ msg_success }}</div>
 {% endif %}
 
-{% block body %}
+{% if msg_error %}
+  <div class="error">{{ msg_error }}</div>
+{% endif %}
 
-<div id="iznad-960">
-<div id="popis-uplata"></div>
-</div>
-
-<div id="top-960"></div>
-<div id="mid-960">
-	
-	<div id="mid-traka-gore">
-		<div id="logo2"></div>
-		<div id="user">Dobrodošli, <i>admin</i></div>
-		<div id="odjava-box"><a href="http://localhost:8000/logout"><button class="minimal">Odjava</button></a></div>
-	</div>
-	
-	<div id="lista-top"></div>
-	<div id="lista-mid">
-	<ul>
-    
-    <li>March 19, 2012, midnight March 19, 2013, midnight admin</li>
-    
-    <li>March 19, 2012, midnight March 19, 2013, midnight admin</li>
-    
-    <li>March 19, 2012, midnight March 19, 2013, midnight admin</li>
-    
-    <li>Jan. 27, 2012, 12:35 p.m. Jan. 26, 2013, 12:35 p.m. admin</li>
-    
-    <li>Jan. 19, 2012, 1:51 a.m. Jan. 18, 2013, 1:51 a.m. admin</li>
-    
-	</ul>
-	</div>
-	<div id="lista-bottom"></div>
-<br>
-<br>
-</div>
-<div id="bottom-960"></div>
+{% block content %}
 {% endblock %}
 <div id="footer">&copy; 2012. Fer2net</div>
 </body>

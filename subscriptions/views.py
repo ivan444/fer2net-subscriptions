@@ -187,7 +187,7 @@ def loginview(request):
       login(request, user)
       return redirect(c['next'])
     else:
-      c['msg_warning'] = u"Zadali ste neispravni e-mail ili lozinku!"
+      c['msg_error'] = u"Zadali ste neispravan e-mail ili lozinku!"
    
   # show the form 
   return render_to_response('login.html', c)

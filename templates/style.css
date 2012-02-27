@@ -99,16 +99,27 @@ color:white;
 	background-repeat:no-repeat;
 }
 
-input
+input {
+  height: 20px;
+  width: 120px;
+  color: black;
+  background: #white;
+  border-top: 1px #005D7B solid;
+  border-bottom: 1px #005D7B solid;
+  border-right: 1px #005D7B solid;
+  border-left: 1px #005D7B solid;
+}
+
+div#container-prijava-mid input
 {
-height:30px;
-width:252px;
-color: black;
-background: #white;
-border-top:1px #005d7b solid;
-border-bottom:1px #005d7b solid;
-border-left:0px;
-border-right:0px;
+  height:30px;
+  width:252px;
+  color: black;
+  background: #white;
+  border-top:1px #005d7b solid;
+  border-bottom:1px #005d7b solid;
+  border-left:0px;
+  border-right:0px;
 }
 
 .submit input
@@ -552,4 +563,15 @@ li{
   color: #D8000C;
   background-color: #FFBABA;
   background-image: url('images/error.png');
+}
+
+div .dataTables_filter label input {
+  height: 20px;
+  width: 120px;
+  color: black;
+  background: #white;
+  border-top: 1px #005D7B solid;
+  border-bottom: 1px #005D7B solid;
+  border-right: 1px #005D7B solid;
+  border-left: 1px #005D7B solid;
 }

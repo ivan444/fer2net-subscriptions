@@ -1,31 +1,24 @@
+{% extends "base.html" %}
+
 {% load subs-tags %}
-<!-- The DOCTYPE declaration above will set the    -->
-<!-- browser's rendering engine into               -->
-<!-- "Standards Mode". Replacing this declaration  -->
-<!-- with a "Quirks Mode" doctype may lead to some -->
-<!-- differences in layout.                        -->
 
-<html>
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <link type="text/css" rel="stylesheet" href="{% url templates "f2net-subs.css" %}">
-    <link type="text/css" rel="stylesheet" href="{% url templates "demo_page.css" %}">
-    <link type="text/css" rel="stylesheet" href="{% url templates "demo_table.css" %}">
-    <link type="text/css" rel="stylesheet" href="{% url templates "demo_table_jui.css" %}">
-    <link type="text/css" rel="stylesheet" href="{% url templates "jquery.ui.all.css" %}">
-    <link type="text/css" rel="stylesheet" href="{% url templates "jquery.ui.base.css" %}">
-    <link type="text/css" rel="stylesheet" href="{% url templates "jquery.ui.core.css" %}">
-    <link type="text/css" rel="stylesheet" href="{% url templates "jquery.ui.datepicker.css" %}">
-    <title>Fer2Net članarine</title>
+{% block title-extra %} / Član {% endblock %}
 
-    <!--script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script-->
-    <script src="{% url js "jquery.js" %}" type="text/javascript"></script>	
-    <script src="{% url js "jquery.dataTables.min.js" %}" type="text/javascript"></script>	
-    <script src="{% url js "jquery.ui.core.js" %}" type="text/javascript"></script>	
-    <script src="{% url js "jquery.ui.widget.js" %}" type="text/javascript"></script>	
-    <script src="{% url js "jquery.ui.datepicker.js" %}" type="text/javascript"></script>	
-    <script type="text/javascript" src="{% url js "f2net-subs.js" %}"></script>
+{% block extra-css %}
+  <link type="text/css" rel="stylesheet" href="{% url templates "demo_page.css" %}">
+  <link type="text/css" rel="stylesheet" href="{% url templates "demo_table.css" %}">
+  <link type="text/css" rel="stylesheet" href="{% url templates "demo_table_jui.css" %}">
+  <link type="text/css" rel="stylesheet" href="{% url templates "jquery.ui.all.css" %}">
+  <link type="text/css" rel="stylesheet" href="{% url templates "jquery.ui.base.css" %}">
+  <link type="text/css" rel="stylesheet" href="{% url templates "jquery.ui.core.css" %}">
+  <link type="text/css" rel="stylesheet" href="{% url templates "jquery.ui.datepicker.css" %}">
+{% endblock %}
 
+{% block extra-js %}
+  <script src="{% url js "jquery.dataTables.min.js" %}" type="text/javascript"></script>	
+  <script src="{% url js "jquery.ui.core.js" %}" type="text/javascript"></script>	
+  <script src="{% url js "jquery.ui.widget.js" %}" type="text/javascript"></script>	
+  <script src="{% url js "jquery.ui.datepicker.js" %}" type="text/javascript"></script>	
   <script type="text/javascript">
     function deleteSubscription(sid, uid, sdate) {
       if (confirm("Delete subscription for user with ID " + uid + ", date: " + sdate + "?")) {
@@ -49,112 +42,127 @@
 
   </script>
 	<!-- End JS -->
+{% endblock %}
     
-  </head>
-
-<body>
-<script type="text/javascript">
 {% block start-scripts %}
+<script type="text/javascript">
   $(document).ready(function() {
     $('#subs').dataTable();
     $('#bills').dataTable();
     $(".datePicker").datepicker();
   });
-{% endblock %}
 </script>
+{% endblock %}
     
-  <!-- web app will not function without JavaScript enabled -->
-  <noscript>
-    <div style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
-      Your web browser must have JavaScript enabled
-      in order for this application to display correctly.
-    </div>
-  </noscript>
+{% block content %}
+<div id="iznad-container-superuser">
+<div id="superuser"></div>
+</div>
 
-  {% if msg_info %}
-    <div class="info">{{ msg_info|safe }}</div>
-  {% endif %}
+<div id="top-container-960"></div>
 
-  {% if msg_warning %}
-    <div class="warning">{{ msg_warning }}</div>
-  {% endif %}
+<div id="container-960">
 
-  {% if msg_success %}
-    <div class="success">{{ msg_success }}</div>
-  {% endif %}
 
-  <h1>Hello {{ username }}!</h2>
-  <a href="{% url staff %}">Staff page</a>
-  <a href="{% url member %}">Member page</a>
-  <a href="{% url ebanking_payment %}">Upload ebanking XML file</a>
+<div id="mid-traka-gore-960">
+		<div id="logo2-960"></div>
+		<div id="superuser-960"><i>{{ username }}</i></div>
 
-  <table id="subs" cellpadding="0" cellspacing="0" border="0" class="display">
-    <thead>
-      <tr>
-        <td>UserID</td>
-        <td>Username</td>
-        <td>Iznos</td>
-        <td>Valid</td>
-        <td>Do isteka</td>
-        <td>Paymaster</td>
-        <td>Datum</td>
-        <td>Način plaćanja</td>
-        <td>&nbsp;</td>
-      </tr>
-    </thead>
-    <tbody>
-      {% for s in allSubs %}
-        <tr id="{{ s.id }}">
-          <td>{{ s.user.id }}</td>
-          <td>{{ s.user.username }}</td>
-          <td>{{ s.amount }}</td>
-          <td>{{ s.valid }}</td>
-          <td>{{ s.subsEnd|timeuntil }}</td>
-          <td>{{ s.paymaster.username }}</td>
-          <td>{{ s.date|date:"D d M Y" }}</td>
-          <td>{{ s.paymentType }}</td>
-          <td><input id="deleteBtn_{{ s.id }}" type="button" value="Obriši" onclick="deleteSubscription('{{ s.id }}', '{{ s.user.id }}', '{{ s.date|date:"D d M Y" }}')" /></td>
+		<div id="odjava-box-960"><a href="{% url staff %}"><button class="minimal">Staff page</button></a></div>
+		<div id="odjava-box-960"><a href="{% url member %}"><button class="minimal">Member page</button></a></div>
+		<div id="odjava-box-960"><a href="{% url ebanking_payment %}"><button class="minimal">Upload XML</button></a></div>
+		<div id="odjava-box-960"><a href="{% url logout %}"><button class="minimal">Odjava</button></a></div>
+</div>
+
+
+<div id="top-890"></div>
+  
+  <div id="mid-890">
+    <table id="subs" cellpadding="0" cellspacing="0" border="0" class="display">
+      <thead>
+        <tr>
+          <td>UserID</td>
+          <td>Username</td>
+          <td>Iznos</td>
+          <td>Valid</td>
+          <td>Do isteka</td>
+          <td>Paymaster</td>
+          <td>Datum</td>
+          <td>Način plaćanja</td>
+          <td>&nbsp;</td>
         </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        {% for s in allSubs %}
+          <tr id="{{ s.id }}">
+            <td>{{ s.user.id }}</td>
+            <td>{{ s.user.username }}</td>
+            <td>{{ s.amount }}</td>
+            <td>{{ s.valid }}</td>
+            <td>{{ s.subsEnd|timeuntil }}</td>
+            <td>{{ s.paymaster.username }}</td>
+            <td>{{ s.date|date:"d.m.Y." }}</td>
+            <td>{{ s.paymentType }}</td>
+            <td><button id="deleteBtn_{{ s.id }}" style="width: 80px; height: 20px; padding-top: 3px;" type="button" class="minimal" onclick="deleteSubscription('{{ s.id }}', '{{ s.user.id }}', '{{ s.date|date:"D d M Y" }}')" >Obriši</button></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+	</div>
+	<div id="bottom-890"></div>
 
   <h2>Računi</h2>
-  <table id="bills" cellpadding="0" cellspacing="0" border="0" class="display">
-    <thead>
-      <tr>
-        <td>Tip</td>
-        <td>Iznos</td>
-        <td>Datum plaćanja</td>
-        <td>Traje do</td>
-        <td>Ak. god.</td>
-        <td>Komentar</td>
-      </tr>
-    </thead>
-    <tbody>
-      {% for b in allBills %}
+  <div id="top-890"></div>
+  <div id="mid-890">
+    <table id="bills" cellpadding="0" cellspacing="0" border="0" class="display">
+      <thead>
         <tr>
-          <td>{{ billTypes|dget:b.billType }}</td>
-          <td>{{ b.amount }}</td>
-          <td>{{ b.date|date:"D d M Y" }}</td>
-          <td>{{ b.expirationDate|date:"D d M Y" }}</td>
-          <td>{{ b.academicYear }}</td>
-          <td>{{ b.comment|default_if_none:"-" }}</td>
+          <td>Tip</td>
+          <td>Iznos</td>
+          <td>Datum plaćanja</td>
+          <td>Traje do</td>
+          <td>Ak. god.</td>
+          <td>Komentar</td>
         </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        {% for b in allBills %}
+          <tr>
+            <td>{{ billTypes|dget:b.billType }}</td>
+            <td>{{ b.amount }}</td>
+            <td>{{ b.date|date:"d.m.Y." }}</td>
+            <td>{{ b.expirationDate|date:"d.m.Y." }}</td>
+            <td>{{ b.academicYear }}</td>
+            <td>{{ b.comment|default_if_none:"-" }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+	</div>
+	
+	<div id="bottom-890"></div>
 
+  <h2>Dodaj račun</h2>
+  <div id="top-890"></div>
+  <div id="mid-890">
 
-  <h3>Dodaj račun</h3>
-  <form name="add_bill_frm" action="{% url superuser %}" method="POST">
-    {% csrf_token %}
-    {{ bill_form.as_ul }}
-    <input type="submit" value="Dodaj" />
-  </form>
+    <form name="add_bill_frm" action="{% url superuser %}" method="POST">
+      {% csrf_token %}
+      <table style="font-size:12px;">
+        <tbody>
+          {{ bill_form.as_table }}
+          <tr><td>&nbsp;</td><td><button class="minimal" style="float:left" type="submit">Dodaj</button></td></tr>
+       </tbody>
+    </table>
+    </form>
+	</div>
+	
+	<div id="bottom-890"></div>
+  <br><br>
 
-  <a href="{% url logout %}">Logout</a>
+</div>
+<div id="bottom-container-960"></div>
 
-  </body>
-</html>
+{% endblock %}
 
