@@ -12,8 +12,8 @@ import logging
 import md5
 import xml.dom.minidom
 from django.db import connection
-from subscriptions.auth import VBULLETIN_CONFIG
-from subscriptions.models import Subscription, Bill, BillForm, EBankingUploadForm, EBankingSubForm, fetchUser, activateMember, deactivateMember
+from subsf2net.subscriptions.auth import VBULLETIN_CONFIG
+from subsf2net.subscriptions.models import Subscription, Bill, BillForm, EBankingUploadForm, EBankingSubForm, fetchUser, activateMember, deactivateMember
 
 logger = logging.getLogger('subscriptions')
 

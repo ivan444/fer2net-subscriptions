@@ -3,8 +3,8 @@ from django.db import models
 from django import forms
 from django.contrib.auth.models import User
 from django.db import connection, transaction
-from subscriptions.auth import VBULLETIN_CONFIG
-import settings
+from subsf2net.subscriptions.auth import VBULLETIN_CONFIG
+from subsf2net import settings
 from datetime import datetime, timedelta
 import logging
 

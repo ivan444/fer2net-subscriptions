@@ -1,4 +1,4 @@
-import settings
+from subsf2net import settings
 
 VBULLETIN_CONFIG = {
     'tableprefix': settings.cfgTablePrefix,

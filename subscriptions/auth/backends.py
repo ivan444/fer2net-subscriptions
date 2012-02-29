@@ -4,7 +4,7 @@ import md5
 from django.contrib.auth.models import User
 from django.contrib.auth.backends import ModelBackend
 
-from subscriptions.auth import VBULLETIN_CONFIG
+from subsf2net.subscriptions.auth import VBULLETIN_CONFIG
 
 logger = logging.getLogger('subscriptions')
 
