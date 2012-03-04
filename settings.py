@@ -197,7 +197,7 @@ LOGGING = {
       'propagate': True,
     },
     'subscriptions': {
-      'handlers': ['file', 'mail_admins'],
+      'handlers': ['mail_admins'],
       'level': 'INFO',
     },
   }

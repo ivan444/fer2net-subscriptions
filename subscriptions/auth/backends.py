@@ -56,7 +56,7 @@ class VBulletinBackend(ModelBackend):
                 user.set_unusable_password()
                 user.save()
 
-            logger.info("User with id " + str(user.id) + " logged in.")
+            logger.debug("User with id " + str(user.id) + " logged in.")
             return user
             
         return None
