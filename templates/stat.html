@@ -38,7 +38,7 @@
 
 	<div id="mid-traka-gore-960">
 		<div id="logo2-960"></div>
-    <div id="superuser-960">Dobrodišli, <i>{{ request.user.username }}!</i></div>
+    <div id="superuser-960">Dobrodošli, <i>{{ request.user.username }}!</i></div>
 
     {% if request.user.is_superuser %}
       <div id="odjava-box-960"><a href="{% url superuser %}"><button class="minimal">Superuser page</button></a></div>

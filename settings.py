@@ -133,8 +133,7 @@ MIDDLEWARE_CLASSES = (
 
 AUTHENTICATION_BACKENDS = ('subsf2net.subscriptions.auth.backends.VBulletinBackend', )
 
-AUTH_PROFILE_MODULE = 'subsf2net.subscriptions.UserProfile'
-
+AUTH_PROFILE_MODULE = 'subscriptions.UserProfile'
 
 ROOT_URLCONF = 'urls'
 
@@ -180,7 +179,7 @@ LOGGING = {
     'file':{
       'level': 'INFO',
       'class': 'logging.handlers.RotatingFileHandler',
-      'filename': '/var/www/subsf2net/info.log',
+      'filename': 'info.log',
       'formatter': 'verbose',
       'maxBytes': 10485760,
       'backupCount': 10,
@@ -198,7 +197,7 @@ LOGGING = {
       'propagate': True,
     },
     'subscriptions': {
-      'handlers': ['mail_admins'],
+      'handlers': ['file', 'mail_admins'],
       'level': 'INFO',
     },
   }

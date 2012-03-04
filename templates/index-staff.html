@@ -13,22 +13,19 @@
   <script type="text/javascript">
 
     function confirmPayment(uid) {
-      //alert('Done! ' + uid);
-      $('#paymentBtn_'+uid).attr("disabled", "true");
-      $('#delayBtn_'+uid).attr("disabled", "true");
       $('#deleteBtn_'+uid).removeAttr("disabled");
       $('#expr_days_'+uid).text("365");
     }
 
     function confirmDeletePayment(uid) {
-      //alert('Done! ' + uid);
       $('#paymentBtn_'+uid).removeAttr("disabled");
       $('#delayBtn_'+uid).removeAttr("disabled");
-      $('#deleteBtn_'+uid).attr("disabled", "true");
       $('#expr_days_'+uid).text("-");
     }
 
     function makePayment(uid, amount) {
+      $('#paymentBtn_'+uid).attr("disabled", "disabled");
+      $('#delayBtn_'+uid).attr("disabled", "disabled");
       $.ajax({
         url: '{% url make_payment %}/'+uid+'/'+amount,
         error: function(jqXHR, textStatus, errorThrown) {
@@ -41,6 +38,7 @@
     }
 
     function deletePayment(uid) {
+      $('#deleteBtn_'+uid).attr("disabled", "disabled");
       $.ajax({
         url: '{% url delete_payment %}/'+uid,
         error: function(jqXHR, textStatus, errorThrown) {
