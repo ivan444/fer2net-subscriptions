@@ -36,7 +36,7 @@ def activateMember(user):
           """
     cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], user.id))
     try:
-      gids = cursor.fetchone().split(',')
+      gids = cursor.fetchone()[0].split(',')
       gids.remove(VBULLETIN_CONFIG['not_paid_groupid'])
       gids.append(VBULLETIN_CONFIG['paid_groupid'])
       query = """
@@ -87,7 +87,7 @@ def deactivateMember(user):
           """
     cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], user.id))
     try:
-      gids = cursor.fetchone().split(',')
+      gids = cursor.fetchone()[0].split(',')
       gids.remove(VBULLETIN_CONFIG['paid_groupid'])
       gids.append(VBULLETIN_CONFIG['not_paid_groupid'])
       query = """
