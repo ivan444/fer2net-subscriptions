@@ -172,11 +172,12 @@ def fetchUser(uid):
     #    user.get_profile().save()
 
     # Process additional usergroups
-    for groupid in [int(cgid) for cgid in row[3].split(',')]:
-      if groupid in VBULLETIN_CONFIG['superuser_groupids']:
+    for groupid in row[3].split(','):
+      if groupid == '': continue
+      if int(groupid) in VBULLETIN_CONFIG['superuser_groupids']:
         user.is_superuser = True
         user.is_staff = True
-      if groupid in VBULLETIN_CONFIG['staff_groupids']:
+      if int(groupid) in VBULLETIN_CONFIG['staff_groupids']:
         user.is_staff = True
     
     user.set_unusable_password()

@@ -343,10 +343,10 @@ def importEbankingPayments(request):
       if frm.is_valid():
         ret = frm.save()
         if ret == None:
-          logger.warn("Payment (uid = %s) skipped!" % (frm,))
+          logger.warn("Payment (uid = %s) skipped!" % (str(frm),))
           msgInfo += "<li>Payment skipped!</li>"
         else:
-          logger.info("Payment (uid = %s) processed!" % (frm,))
+          logger.info("Payment (uid = %s) processed!" % (str(frm),))
           msgInfo += "<li>Payment processed!</li>"
 
       else:
