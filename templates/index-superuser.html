@@ -97,7 +97,7 @@
         {% for s in allSubs %}
           <tr id="{{ s.id }}">
             <td>{{ s.user.id }}</td>
-            <td>{{ s.user.username }}</td>
+            <td>{{ s.user.username|trcchars:21 }}</td>
             <td>{{ s.amount }}</td>
             <td>{{ s.valid }}</td>
             <td>{{ s.subsEnd|timeuntil }}</td>
