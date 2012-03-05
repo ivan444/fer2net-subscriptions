@@ -40,17 +40,18 @@ class VBulletinBackend(ModelBackend):
                 user.is_superuser = False
 
                 # Process primary usergroup
-                if str(row[4]) in VBULLETIN_CONFIG['superuser_groupids']:
+                if int(row[4]) in VBULLETIN_CONFIG['superuser_groupids']:
                     user.is_staff = True    
                     user.is_superuser = True
-                elif str(row[4]) in VBULLETIN_CONFIG['staff_groupids']:
+                elif int(row[4]) in VBULLETIN_CONFIG['staff_groupids']:
                     user.is_staff = True
                 
                 # Process additional usergroups
                 for groupid in row[5].split(','):
-                    if str(groupid) in VBULLETIN_CONFIG['superuser_groupids']:
+                    if groupid == '': continue
+                    if int(groupid) in VBULLETIN_CONFIG['superuser_groupids']:
                         user.is_superuser = True
-                    if str(groupid) in VBULLETIN_CONFIG['staff_groupids']:
+                    if int(groupid) in VBULLETIN_CONFIG['staff_groupids']:
                         user.is_staff = True
                 
                 user.set_unusable_password()

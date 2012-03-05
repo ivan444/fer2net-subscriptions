@@ -17,12 +17,12 @@ cfgDevserver = cfg.getboolean("webconfig", "django-devserver")
 cfgAdminName = cfg.get("webconfig", "admin_name")
 cfgAdminEmail = cfg.get("webconfig", "admin_email")
 cfgTablePrefix = cfg.get("webconfig", "tableprefix")
-cfgSuGids = cfg.get("webconfig", "superuser_groupids").split(",")
-cfgStaffGids = cfg.get("webconfig", "staff_groupids").split(",")
-cfgStandardGids = cfg.get("webconfig", "standard_groupids").split(",")
-cfgPaidGid = cfg.get("webconfig", "paid_groupid")
-cfgNotPaidGid = cfg.get("webconfig", "not_paid_groupid")
-cfgBannedGid = cfg.get("webconfig", "banned_groupid")
+cfgSuGids = [int(cgid) for cgid in cfg.get("webconfig", "superuser_groupids").split(",")]
+cfgStaffGids = [int(cgid) for cgid in cfg.get("webconfig", "staff_groupids").split(",")]
+cfgStandardGids = [int(cgid) for cgid in cfg.get("webconfig", "standard_groupids").split(",")]
+cfgPaidGid = cfg.getint("webconfig", "paid_groupid")
+cfgNotPaidGid = cfg.getint("webconfig", "not_paid_groupid")
+cfgBannedGid = cfg.getint("webconfig", "banned_groupid")
 cfgEBPaymasterId = cfg.getint("webconfig", "ebanking_paymaster_id")
 
 DEBUG = cfgDebug.lower() == "true"

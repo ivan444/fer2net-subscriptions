@@ -14,29 +14,30 @@ def activateMember(user):
   """Activation of an member."""
   cursor = connection.cursor()
 
-  if (str(usergroupid(user)) in VBULLETIN_CONFIG['standard_groupids']):
+  if usergroupid(user) in VBULLETIN_CONFIG['standard_groupids']:
     query = """
              UPDATE %suser
              SET `usergroupid` = %s
              WHERE userid = %s
           """
-    cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], VBULLETIN_CONFIG['paid_groupid'], user.id))
-  elif usergroupid(user) == int(VBULLETIN_CONFIG['banned_groupid']):
+    cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], VBULLETIN_CONFIG['paid_groupid'], str(user.id)))
+  elif usergroupid(user) == VBULLETIN_CONFIG['banned_groupid']:
     query = """
              UPDATE %suserban
              SET `usergroupid` = %s
              WHERE userid = %s
           """
-    cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], VBULLETIN_CONFIG['paid_groupid'], user.id))
+    cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], VBULLETIN_CONFIG['paid_groupid'], str(user.id)))
   else:
     query = """
              SELECT membergroupids
              FROM %suser
              WHERE userid = %s
           """
-    cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], user.id))
+    cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], str(user.id)))
     try:
-      gids = cursor.fetchone()[0].split(',')
+      row = cursor.fetchone()
+      gids = [int(cgid) for cgid in str(row[0]).split(',')]
       gids.remove(VBULLETIN_CONFIG['not_paid_groupid'])
       gids.append(VBULLETIN_CONFIG['paid_groupid'])
       query = """
@@ -44,17 +45,14 @@ def activateMember(user):
                SET membergroupids = '%s'
                WHERE userid = %s
             """
-      cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], ','.join(gids), user.id))
+      cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], ','.join([str(cgid) for cgid in gids]), str(user.id)))
       transaction.commit_unless_managed()
     except Exception as e:
-      msg_warning = "Error activating user with ID %s!" % (user.id,)
+      msg_warning = "Error activating user with ID %s (gids:%s)!" % (user.id, str(gids))
       logger.error(msg_warning + "\n" + str(e))
+      return
 
   transaction.commit_unless_managed()
-
-  if not user.profile.subscribed:
-    user.get_profile().subscribed = True
-    user.get_profile().save()
 
   logger.info("User with ID %d is now activated!" % (user.id,))
 
@@ -63,21 +61,21 @@ def deactivateMember(user):
   """Deactivation of an member."""
   cursor = connection.cursor()
 
-  if usergroupid(user) == int(VBULLETIN_CONFIG['paid_groupid']):
+  if usergroupid(user) == VBULLETIN_CONFIG['paid_groupid']:
     query = """
              UPDATE %suser
              SET `usergroupid` = %s
              WHERE userid = %s
           """
-    cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], VBULLETIN_CONFIG['not_paid_groupid'], user.id))
+    cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], VBULLETIN_CONFIG['not_paid_groupid'], str(user.id)))
 
-  elif userbannedgroupid(user) == int(VBULLETIN_CONFIG['paid_groupid']):
+  elif userbannedgroupid(user) == VBULLETIN_CONFIG['paid_groupid']:
     query = """
              UPDATE %suserban
              SET `usergroupid` = %s
              WHERE userid = %s
           """
-    cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], VBULLETIN_CONFIG['not_paid_groupid'], user.id))
+    cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], VBULLETIN_CONFIG['not_paid_groupid'], str(user.id)))
 
   else:
     query = """
@@ -85,9 +83,9 @@ def deactivateMember(user):
              FROM %suser
              WHERE userid = %s
           """
-    cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], user.id))
+    cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], str(user.id)))
     try:
-      gids = cursor.fetchone()[0].split(',')
+      gids = [int(cgid) for cgid in str(cursor.fetchone()[0]).split(',')]
       gids.remove(VBULLETIN_CONFIG['paid_groupid'])
       gids.append(VBULLETIN_CONFIG['not_paid_groupid'])
       query = """
@@ -95,15 +93,12 @@ def deactivateMember(user):
                SET membergroupids = '%s'
                WHERE userid = %s
             """
-      cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], ','.join(gids), user.id))
+      cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], ','.join([str(cgid) for cgid in gids]), str(user.id)))
       transaction.commit_unless_managed()
     except Exception as e:
-      msg_warning = "Error deactivating user with ID %s!" % (user.id,)
+      msg_warning = "Error deactivating user with ID %s!" % (str(user.id),)
       logger.error(msg_warning + "\n" + str(e))
-
-  if user.profile.subscribed:
-    user.get_profile().subscribed = False
-    user.get_profile().save()
+      return
 
   logger.info("User with ID %d is now deactivated!" % (user.id,))
 
@@ -136,7 +131,6 @@ def userbannedgroupid(user):
 
 class UserProfile(models.Model):
   user = models.ForeignKey(User, unique=True)
-  subscribed = models.BooleanField(default=False)
 
 User.profile = property(lambda u: UserProfile.objects.get_or_create(user=u)[0])
 
@@ -165,20 +159,20 @@ def fetchUser(uid):
     user.is_superuser = False
 
     # Process primary usergroup
-    if row[2] in VBULLETIN_CONFIG['superuser_groupids']:
+    if int(row[2]) in VBULLETIN_CONFIG['superuser_groupids']:
       user.is_staff = True    
       user.is_superuser = True
-    elif row[2] in VBULLETIN_CONFIG['staff_groupids']:
+    elif int(row[2]) in VBULLETIN_CONFIG['staff_groupids']:
       user.is_staff = True
 
-    # Check if user is subscribed
-    if row[2] == VBULLETIN_CONFIG['paid_groupid'] or VBULLETIN_CONFIG['paid_groupid'] in row[3].split(","):
-      if not user.profile.subscribed:
-        user.get_profile().subscribed = True
-        user.get_profile().save()
+    ## Check if user is subscribed
+    #if int(row[2]) == VBULLETIN_CONFIG['paid_groupid'] or VBULLETIN_CONFIG['paid_groupid'] in [int(cgid) for cgid in row[3].split(",")]:
+    #  if not user.profile.subscribed:
+    #    user.get_profile().subscribed = True
+    #    user.get_profile().save()
 
     # Process additional usergroups
-    for groupid in row[3].split(','):
+    for groupid in [int(cgid) for cgid in row[3].split(',')]:
       if groupid in VBULLETIN_CONFIG['superuser_groupids']:
         user.is_superuser = True
         user.is_staff = True
@@ -236,6 +230,18 @@ class BillForm(forms.ModelForm):
     model = Bill
 
 
+def isSubscribed(user):
+  cursor = connection.cursor()
+  cursor.execute("""SELECT usergroupid, membergroupids
+                    FROM """ + VBULLETIN_CONFIG['tableprefix'] + """user WHERE userid = %s""",
+                 [user.id])
+  row = cursor.fetchone()
+  if int(row[0]) == VBULLETIN_CONFIG['paid_groupid'] or VBULLETIN_CONFIG['paid_groupid'] in [int(cgid) for cgid in row[1].split(",")]:
+    return True
+  else:
+    return False
+
+
 class EBankingSubForm(forms.Form):
   userid = forms.IntegerField(min_value=0)
   amount = forms.IntegerField(min_value=0)
@@ -251,7 +257,7 @@ class EBankingSubForm(forms.Form):
       return None
 
     # skip if already subscribed
-    if user.profile.subscribed:
+    if isSubscribed(user):
       logging.warn("User with ID '%s' is already subscribed!" % (self.cleaned_data["userid"],))
       return None
 
