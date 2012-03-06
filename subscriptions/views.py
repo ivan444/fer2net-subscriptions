@@ -13,6 +13,7 @@ import md5
 import xml.dom.minidom
 from django.db import connection
 from subsf2net.subscriptions.auth import VBULLETIN_CONFIG
+from subsf2net import settings
 from subsf2net.subscriptions.models import Subscription, Bill, BillForm, EBankingUploadForm, EBankingSubForm, fetchUser, activateMember, deactivateMember
 
 logger = logging.getLogger('subscriptions')
@@ -21,7 +22,7 @@ logger = logging.getLogger('subscriptions')
 def index(request):
   if request.user.is_superuser:
     return indexSuperuser(request)
-  elif request.user.is_staff:
+  elif request.user.is_staff and settings.cfgSubsPeriod:
     return indexStaff(request)
   else:
     return indexMember(request)
@@ -53,8 +54,8 @@ def indexSuperuser(request, msg_info=None):
 
 @login_required 
 def indexStaff(request):
-  if not (request.user.is_staff or request.user.is_superuser):
-    return HttpResponse("user is not staff member!", status=403)
+  if not ((request.user.is_staff and settings.cfgSubsPeriod) or request.user.is_superuser):
+    return HttpResponse("user is not staff member or subs. collection period is over!", status=403)
 
   cursor = connection.cursor()
 
@@ -72,12 +73,12 @@ def indexStaff(request):
       usr["valid"] = False
     usr["username"] = r[3]
     usr["email"] = r[4]
-    subs = Subscription.objects.filter(user__id = int(r[0])).order_by('-date').all()
-    if len(subs) == 0:
-      usr["sub_expr"] = -365
-    else:
-      td = datetime.now() - subs[0].date
-      usr["sub_expr"] = max(-365, 365-td.days)
+    #subs = Subscription.objects.filter(user__id = int(r[0])).order_by('-date').all()
+    #if len(subs) == 0:
+    #  usr["sub_expr"] = -365
+    #else:
+    #  td = datetime.now() - subs[0].date
+    #  usr["sub_expr"] = max(-365, 365-td.days)
 
     allUsers.append(usr)
 
@@ -90,22 +91,28 @@ def makePayment(request, uid=None, amount=None):
   Make payment for user (create subscription).
   """
   if uid==None or amount==None: return Http404("no params")
-  if not (request.user.is_staff or request.user.is_superuser):
-    return HttpResponse("user is not staff member!", status=403)
+  if not ((request.user.is_staff and settings.cfgSubsPeriod) or request.user.is_superuser):
+    return HttpResponse("user is not staff member or subs. collection period is over!", status=403)
+
+  intAmount = int(amount)
+
+  request.session.modified = True
 
   user = fetchUser(uid)
-  intAmount = int(amount)
+  (actOk, oldGid) = activateMember(user)
+
+  if not actOk:
+    logger.warn("Failed to activate in-person (live) payment for user (%d, %s) by paymaster (%d, %s), amount %d." % (user.id, user.username, request.user.id, request.user.username, intAmount))
+    return HttpResponse('{status:"failed"}', mimetype='application/javascript; charset=utf8', status=400)
+
   sub = Subscription(user=user, amount=intAmount)
+  sub.oldGroupId = oldGid
   sub.delayed = intAmount == 0
   sub.paymaster = request.user
   sub.paymentType = 'P'
   sub.date = datetime.now()
   sub.subsEnd = sub.date + timedelta(days=365)
   sub.save()
-
-  request.session.modified = True
-
-  activateMember(user)
 
   logger.info("Made in-person (live) payment for user (%d, %s) by paymaster (%d, %s), amount %d." % (user.id, user.username, request.user.id, request.user.username, intAmount))
 
@@ -122,20 +129,25 @@ def superuserDeletePayment(request, sid=None):
     return HttpResponse("user is not superuser!", status=403)
 
   iSid = int(sid)
+  deactOk = False
   try:
     s = Subscription.objects.get(pk=iSid)
     if s.valid:
       snewst = s.user.subscriptions.filter(valid=True).order_by('-subsEnd')[0]
       if snewst.id == s.id:
-        deactivateMember(s.user)
+        deactOk = deactivateMember(s.user, s.oldGroupId)
   except Subscription.DoesNotExist:
     return HttpResponse("subscription with ID %d does not exist!" % (sid,), status=404)
 
-  logger.info("Superuser (%s) deleted subscription with ID %d (date, user, userId) = (%s, %s, %d)." % (request.user.username, s.id, s.date, s.user.username, s.user.id))
-  s.delete()
-
   request.session.modified = True
-  return HttpResponse('{status:"ok"}', mimetype='application/javascript; charset=utf8')
+
+  if deactOk:
+    logger.info("Superuser (%s) deleted subscription with ID %d (date, user, userId) = (%s, %s, %d)." % (request.user.username, s.id, s.date, s.user.username, s.user.id))
+    s.delete()
+    return HttpResponse('{status:"ok"}', mimetype='application/javascript; charset=utf8')
+  else:
+    logger.warn("Superuser (%s) FAILED to delete subscription with ID %d (date, user, userId) = (%s, %s, %d)." % (request.user.username, s.id, s.date, s.user.username, s.user.id))
+    return HttpResponse('{status:"failed"}', mimetype='application/javascript; charset=utf8', status=400)
 
 
 @login_required
@@ -145,8 +157,8 @@ def deletePayment(request, uid=None):
   Subscription will be deleted ONLY IF (s.paymaster == request.user AND s.date == today).
   """
   if uid==None: return Http404("no params")
-  if not (request.user.is_staff or request.user.is_superuser):
-    return HttpResponse("user is not staff member!", status=403)
+  if not ((request.user.is_staff and settings.cfgSubsPeriod) or request.user.is_superuser):
+    return HttpResponse("user is not staff member or subs. collection period is over!", status=403)
 
   user = fetchUser(uid)
   nw = datetime.now()
@@ -155,13 +167,17 @@ def deletePayment(request, uid=None):
   if len(ss) == 0:
     return HttpResponse("there are no subscriptions to delete", status=404)
   else:
-    deactivateMember(user)
     sub = ss[0]
-    sub.valid = False
-    sub.save()
+    deactOk = deactivateMember(user, sub.oldGroupId)
+    if deactOk:
+      sub.valid = False
+      sub.save()
 
-    logger.info("Staff member (%s) invalidated (deleted) subscription with ID %d (date, user, userId) = (%s, %s, %d)" % (request.user.username, sub.id, sub.date, sub.user.username, sub.user.id))
-    return HttpResponse('{status:"ok"}', mimetype='application/javascript; charset=utf8')
+      logger.info("Staff member (%s) invalidated (deleted) subscription with ID %d (date, user, userId) = (%s, %s, %d)" % (request.user.username, sub.id, sub.date, sub.user.username, sub.user.id))
+      return HttpResponse('{status:"ok"}', mimetype='application/javascript; charset=utf8')
+    else:
+      logger.warn("Staff member (%s) FAILED to invalidate (delete) subscription with ID %d (date, user, userId) = (%s, %s, %d)" % (request.user.username, sub.id, sub.date, sub.user.username, sub.user.id))
+      return HttpResponse('{status:"failed"}', mimetype='application/javascript; charset=utf8', status=400)
 
 
 def loginview(request):

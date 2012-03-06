@@ -14,6 +14,7 @@ dbHost = cfg.get("webconfig", "host")
 dbPort = cfg.get("webconfig", "port")
 cfgDebug = cfg.get("webconfig", "debug")
 cfgDevserver = cfg.getboolean("webconfig", "django-devserver")
+cfgSubsPeriod = cfg.getboolean("webconfig", "subs_period")
 cfgAdminName = cfg.get("webconfig", "admin_name")
 cfgAdminEmail = cfg.get("webconfig", "admin_email")
 cfgTablePrefix = cfg.get("webconfig", "tableprefix")
@@ -22,6 +23,7 @@ cfgStaffGids = [int(cgid) for cgid in cfg.get("webconfig", "staff_groupids").spl
 cfgStandardGids = [int(cgid) for cgid in cfg.get("webconfig", "standard_groupids").split(",")]
 cfgPaidGid = cfg.getint("webconfig", "paid_groupid")
 cfgNotPaidGid = cfg.getint("webconfig", "not_paid_groupid")
+cfgSubsZeroGid = cfg.getint("webconfig", "subscription_0")
 cfgBannedGid = cfg.getint("webconfig", "banned_groupid")
 cfgEBPaymasterId = cfg.getint("webconfig", "ebanking_paymaster_id")
 

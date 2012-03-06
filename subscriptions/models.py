@@ -13,15 +13,25 @@ logger = logging.getLogger('subscriptions')
 def activateMember(user):
   """Activation of an member."""
   cursor = connection.cursor()
+  gid = usergroupid(user)
+  oldGid = gid
 
-  if usergroupid(user) in VBULLETIN_CONFIG['standard_groupids']:
+  if gid in VBULLETIN_CONFIG['standard_groupids']:
     query = """
              UPDATE %suser
              SET `usergroupid` = %s
              WHERE userid = %s
           """
     cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], VBULLETIN_CONFIG['paid_groupid'], str(user.id)))
-  elif usergroupid(user) == VBULLETIN_CONFIG['banned_groupid']:
+  elif gid == VBULLETIN_CONFIG['banned_groupid']:
+    query = """
+             SELECT `usergroupid`
+             FROM %suserban
+             WHERE userid = %s
+          """
+    cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], str(user.id)))
+    oldGid = int(cursor.fetchone()[0])
+
     query = """
              UPDATE %suserban
              SET `usergroupid` = %s
@@ -38,7 +48,13 @@ def activateMember(user):
     try:
       row = cursor.fetchone()
       gids = [int(cgid) for cgid in str(row[0]).split(',')]
-      gids.remove(VBULLETIN_CONFIG['not_paid_groupid'])
+      if VBULLETIN_CONFIG['subscription_0'] in gids:
+        gids.remove(VBULLETIN_CONFIG['subscription_0'])
+        oldGid = VBULLETIN_CONFIG['subscription_0']
+      else:
+        gids.remove(VBULLETIN_CONFIG['not_paid_groupid'])
+        oldGid = VBULLETIN_CONFIG['not_paid_groupid']
+
       gids.append(VBULLETIN_CONFIG['paid_groupid'])
       query = """
                UPDATE %suser
@@ -50,14 +66,15 @@ def activateMember(user):
     except Exception as e:
       msg_warning = "Error activating user with ID %s (gids:%s)!" % (user.id, str(gids))
       logger.error(msg_warning + "\n" + str(e))
-      return
+      return (False, oldGid)
 
   transaction.commit_unless_managed()
 
   logger.info("User with ID %d is now activated!" % (user.id,))
+  return (True, oldGid)
 
 
-def deactivateMember(user):
+def deactivateMember(user, oldGid):
   """Deactivation of an member."""
   cursor = connection.cursor()
 
@@ -67,7 +84,7 @@ def deactivateMember(user):
              SET `usergroupid` = %s
              WHERE userid = %s
           """
-    cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], VBULLETIN_CONFIG['not_paid_groupid'], str(user.id)))
+    cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], oldGid, str(user.id)))
 
   elif userbannedgroupid(user) == VBULLETIN_CONFIG['paid_groupid']:
     query = """
@@ -75,7 +92,7 @@ def deactivateMember(user):
              SET `usergroupid` = %s
              WHERE userid = %s
           """
-    cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], VBULLETIN_CONFIG['not_paid_groupid'], str(user.id)))
+    cursor.execute(query % (VBULLETIN_CONFIG['tableprefix'], oldGid, str(user.id)))
 
   else:
     query = """
@@ -87,7 +104,7 @@ def deactivateMember(user):
     try:
       gids = [int(cgid) for cgid in str(cursor.fetchone()[0]).split(',')]
       gids.remove(VBULLETIN_CONFIG['paid_groupid'])
-      gids.append(VBULLETIN_CONFIG['not_paid_groupid'])
+      gids.append(oldGid)
       query = """
                UPDATE %suser
                SET membergroupids = '%s'
@@ -98,9 +115,10 @@ def deactivateMember(user):
     except Exception as e:
       msg_warning = "Error deactivating user with ID %s!" % (str(user.id),)
       logger.error(msg_warning + "\n" + str(e))
-      return
+      return False
 
   logger.info("User with ID %d is now deactivated!" % (user.id,))
+  return True
 
 
 def usergroupid(user):
@@ -264,12 +282,19 @@ class EBankingSubForm(forms.Form):
 
     amount = self.cleaned_data["amount"]
     date = self.cleaned_data["date"]
-    s = Subscription(user=user, amount=amount, date=date, paymentType='E', subsEnd=date+timedelta(days=365))
-    s.paymaster=admin
-    s.save()
-    activateMember(user)
-    logging.debug("User with ID '%s' is now subscribed using e-banking." % (self.cleaned_data["userid"],))
-    return s
+
+    (actOk, oldGid) = activateMember(user)
+
+    if actOk:
+      s = Subscription(user=user, amount=amount, date=date, paymentType='E', subsEnd=date+timedelta(days=365))
+      s.paymaster=admin
+      s.oldGroupId = oldGid
+      s.save()
+      logging.debug("User with ID '%s' is now subscribed using e-banking." % (self.cleaned_data["userid"],))
+      return s
+    else:
+      logging.warn("User with ID '%s' FAILED to subscribe using e-banking." % (self.cleaned_data["userid"],))
+      return None
 
 
 class EBankingUploadForm(forms.Form):
@@ -283,6 +308,9 @@ class Subscription(models.Model):
 
   # payment amount
   amount = models.IntegerField()
+
+  # payment amount
+  oldGroupId = models.IntegerField()
 
   # payment is delayed but subscription is active
   delayed = models.BooleanField(default=False)

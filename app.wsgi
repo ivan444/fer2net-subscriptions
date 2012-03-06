@@ -3,6 +3,7 @@ import os
 import sys
 
 paths = ['/var/www', '/var/www/subsf2net/']
+
 for path in paths:
   if path not in sys.path:
     sys.path.append(path)

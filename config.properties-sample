@@ -9,12 +9,14 @@ debug=True
 admin_name=admin
 admin_email=admin@mailinator.com
 tableprefix=
-superuser_groupids=6
+superuser_groupids=6,30
 staff_groupids=5,7
 standard_groupids=2,190,192
 paid_groupid=191
-not_paid_groupid=192
+not_paid_groupid=190
 banned_groupid=8
 django-devserver=False
 ebanking_paymaster_id=1
+subscription_0=192
+subs_period=True
 

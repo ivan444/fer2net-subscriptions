@@ -7,6 +7,7 @@ VBULLETIN_CONFIG = {
     'standard_groupids': settings.cfgStandardGids,
     'paid_groupid': settings.cfgPaidGid,
     'not_paid_groupid': settings.cfgNotPaidGid,
+    'subscription_0': settings.cfgSubsZeroGid,
     'banned_groupid': settings.cfgBannedGid
 }
 
