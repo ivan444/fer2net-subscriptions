@@ -67,7 +67,12 @@ def indexStaff(request):
   for r in rows:
     usr = {}
     usr["userid"] = r[0]
-    if r[1] == int(VBULLETIN_CONFIG['paid_groupid']) or VBULLETIN_CONFIG['paid_groupid'] in r[2].split(","):
+    iMGids = []
+    for rgid in r[2].split(","):
+      if rgid == '': continue
+      else: iMGids.append(int(rgid))
+
+    if int(r[1]) == VBULLETIN_CONFIG['paid_groupid'] or VBULLETIN_CONFIG['paid_groupid'] in iMGids:
       usr["valid"] = True
     else:
       usr["valid"] = False
