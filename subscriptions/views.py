@@ -76,6 +76,7 @@ def indexStaff(request):
       usr["valid"] = True
     else:
       usr["valid"] = False
+    #print str(r[0]) + " " + str(usr["valid"]) + " " + str(VBULLETIN_CONFIG['paid_groupid']) + " " + str(iMGids) + " " + str(int(r[1]))
     usr["username"] = r[3]
     usr["email"] = r[4]
     #subs = Subscription.objects.filter(user__id = int(r[0])).order_by('-date').all()

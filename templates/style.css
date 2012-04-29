@@ -102,7 +102,7 @@ input {
   height: 20px;
   width: 120px;
   color: black;
-  background: #white;
+  background: white;
   border-top: 1px #005D7B solid;
   border-bottom: 1px #005D7B solid;
   border-right: 1px #005D7B solid;
@@ -353,17 +353,24 @@ border: 2px outset #d7b9c9
 	margin-top:5px;
 }
 
-.actionBtn:hover {
-  background: #D3D6FF;
+input.actionBtn:hover {
+  background: #b5e7f9;
 }
 
-.actionBtn {
+input[disabled].actionBtn:hover {
+}
+
+input[disabled]:hover {
+}
+
+input.actionBtn {
   cursor: pointer;
+  background-color: #73CFF1;
 }
 
 input[disabled] {
   border: 1px solid #999;
-  background-color: #ddd;
+  background-color: #C0C0C0;
   cursor: not-allowed;
 }
 
