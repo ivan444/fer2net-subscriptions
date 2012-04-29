@@ -1,25 +1,15 @@
 {% extends "base.html" %}
 
-{% block title-extra %} / Member {% endblock %}
+{% block title-extra %} / Popis uplata {% endblock %}
+
+{% block group-img %}
+<img src="{% url images "popis-uplata.png" %}" border="0" />
+{% endblock %}
 
 {% block content %}
-<div id="iznad-960">
-<div id="popis-uplata"></div>
-</div>
-
-<div id="top-960"></div>
-<div id="mid-960">
-	
-	<div id="mid-traka-gore">
-		<div id="logo2"></div>
-    <div id="user">Dobrodošli, <i>{{ username }}</i></div>
-		<div id="odjava-box"><a href="{% url stats %}"><button class="minimal">Statistike</button></a></div>
-		<div id="odjava-box"><a href="{% url logout %}"><button class="minimal">Odjava</button></a></div>
-		<!--div id="odjava-box"><a href="http://localhost:8000/logout"><button class="minimal">Odjava</button></a></div-->
-	</div>
-	
-	<div id="lista-top"></div>
-	<div id="lista-mid">
+<div id="top-890"></div>
+  
+  <div id="mid-890">
   <table id="totals" style="width:500px;" cellpadding="0" cellspacing="0" border="0" class="display">
   <thead>
     <tr style="font-weight:bolder;">
@@ -40,10 +30,6 @@
 
 	</div>
 
-	<div id="lista-bottom"></div>
-<br>
-<br>
-</div>
-<div id="bottom-960"></div>
+	<div id="bottom-890"></div>
 {% endblock %}
 

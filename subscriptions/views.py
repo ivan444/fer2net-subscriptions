@@ -31,7 +31,7 @@ def index(request):
 @login_required 
 def indexMember(request):
   subs = Subscription.objects.filter(user__id = request.user.id).filter(valid=True).order_by('-date').all()
-  return render_to_response('index-member.html', {'username': request.user.username, 'subs': subs})
+  return render_to_response('index-member.html', {'subs': subs, 'subs_period': settings.cfgSubsPeriod}, context_instance=RequestContext(request))
 
 
 @login_required 
@@ -49,7 +49,7 @@ def indexSuperuser(request, msg_info=None):
   subs = Subscription.objects.order_by('-date').all()
   bills = Bill.objects.order_by('-date').all()
 
-  return render_to_response('index-superuser.html', {'msg_info':msg_info, 'username': request.user.username, 'allSubs': subs, 'bill_form': form, 'allBills': bills, 'billTypes': Bill.BILL_TYPES_DICT}, context_instance=RequestContext(request))
+  return render_to_response('index-superuser.html', {'msg_info':msg_info, 'allSubs': subs, 'bill_form': form, 'allBills': bills, 'billTypes': Bill.BILL_TYPES_DICT, 'subs_period': settings.cfgSubsPeriod}, context_instance=RequestContext(request))
 
 
 @login_required 
@@ -87,7 +87,7 @@ def indexStaff(request):
 
     allUsers.append(usr)
 
-  return render_to_response('index-staff.html', {'allUsers': allUsers})
+  return render_to_response('index-staff.html', {'allUsers': allUsers, 'subs_period': settings.cfgSubsPeriod}, context_instance=RequestContext(request))
 
 
 @login_required 
@@ -287,6 +287,7 @@ def stats(request):
     'ebByYear':ebByYear,
     'aYears':aYears,
     'bills':bills,
+    'subs_period': settings.cfgSubsPeriod,
     'billTypes': Bill.BILL_TYPES_DICT}
 
   return render_to_response('stat.html', context, context_instance=RequestContext(request))

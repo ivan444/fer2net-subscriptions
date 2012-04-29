@@ -36,19 +36,18 @@ color:white;
 	width:328px;
 	height:40px;
 	margin:80px auto 0px auto;
-	background-image:url('images/prijava.png');
-	background-position: left top;
-	background-repeat:no-repeat;
 }
 
 #strelica{
-	width:56px;
-	height:40px;
-	margin:0px 0px 0px 80px;
-	background-image:url('images/strelica.png');
-	background-position:left top;
-	background-repeat:no-repeat;
+  float:left;
+  margin-left: -10px;
 }
+
+#group-img {
+  float:left;
+  display:inline;
+}
+
 
 #prijava{
 	padding-top:8px;
@@ -272,9 +271,6 @@ border: 2px outset #d7b9c9
 	width:960px;
 	height:40px;
 	margin:40px auto 0px auto;
-	background-image:url('images/statistike.png');
-	background-repeat:no-repeat;
-	background-position:left top;
 }
 
 #statistike{
@@ -350,7 +346,7 @@ border: 2px outset #d7b9c9
 #logo2-960{
 	float:left;
 	background-image:url('images/logo2.jpg');
-	width:93px;
+	width:105px;
 	height:30px;
 	background-position:left top;
 	background-repeat:no-repeat;
@@ -382,15 +378,13 @@ input[disabled] {
 	margin:8px 15px auto 0px;
 }
 
-#superuser-960{
-	width:132px;
-	height:18px;
-	float:left;
+#username{
+	float:right;
 	color:white;
 	font-size:14px;
 	font-weight:bold;
 	text-align:right;
-	margin:8px 15px auto 0px;
+	margin:8px 10px auto 0px;
 }
 
 
@@ -474,7 +468,13 @@ button.minimal {
 	padding: 8px 0 9px;
 	text-align: center;
 	text-shadow: 0 1px 0 #a4dcf1;
-	width: 130px; }
+	width: 95px;
+  margin: 0 0 0 4px;
+}
+
+#buttons {
+  float:right;
+}
   
 button.minimal:hover 
 {

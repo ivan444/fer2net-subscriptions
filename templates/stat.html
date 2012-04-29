@@ -25,37 +25,16 @@
   });
 </script>
 {% endblock %}
-    
+
+{% block group-img %}
+<img src="{% url images "statistike.png" %}" border="0" />
+{% endblock %}
 
 {% block content %}
-<div id="iznad-container">
-<div id="statistike"></div>
-</div>
-
-<div id="top-container-960"></div>
-
-<div id="container-960">
-
-	<div id="mid-traka-gore-960">
-		<div id="logo2-960"></div>
-    <div id="superuser-960">Dobrodošli, <i>{{ request.user.username }}!</i></div>
-
-    {% if request.user.is_superuser %}
-      <div id="odjava-box-960"><a href="{% url superuser %}"><button class="minimal">Superuser page</button></a></div>
-    {% endif %}
-    {% if request.user.is_staff %}
-      <div id="odjava-box-960"><a href="{% url staff %}"><button class="minimal">Staff page</button></a></div>
-    {% endif %}
-		<div id="odjava-box-960"><a href="{% url member %}"><button class="minimal">Member page</button></a></div>
-		<div id="odjava-box-960"><a href="{% url stats %}"><button class="minimal">Statistike</button></a></div>
-		<div id="odjava-box-960"><a href="{% url logout %}"><button class="minimal">Odjava</button></a></div>
-	</div>
-
 	<div id="top-890"></div>
 	
-	
   <div id="mid-890-static">
-    <table id="totals" cellpadding="0" cellspacing="0" border="1" class="display">
+    <table id="totals" cellpadding="0" cellspacing="0" border="0" class="display">
       <thead>
         <tr style="font-weight:bolder;">
           <td style="width: 75%">Opis</td>
@@ -160,11 +139,5 @@
   
   <div id="bottom-890"></div>
   {% endif %}
-
-  <br/>
-  </div>
-
-  <div id="bottom-container-960"></div>
-
 {% endblock %}
 

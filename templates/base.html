@@ -42,8 +42,45 @@
   <div class="error">{{ msg_error }}</div>
 {% endif %}
 
+<div id="iznad-container">
+<div id="group-img">
+{% block group-img %}
+{% endblock %}
+</div>
+<div id="strelica">
+<img src="{% url images "strelica.png" %}" border="0" />
+</div>
+</div>
+
+<div id="top-container-960"></div>
+
+<div id="container-960">
+
+<div id="mid-traka-gore-960">
+		<div id="logo2-960"></div>
+    <div id="buttons">
+{% block navigation %}
+		<a href="{% url logout %}"><button class="minimal">Odjava</button></a>
+		<a href="{% url stats %}"><button class="minimal">Statistike</button></a>
+		<a href="{% url member %}"><button class="minimal">Uplate</button></a>
+    {% if request.user.is_staff and subs_period or request.user.is_superuser %}
+		<a href="{% url staff %}"><button class="minimal">Staff</button></a>
+    {% endif %}
+    {% if request.user.is_superuser %}
+		<a href="{% url superuser %}"><button class="minimal">Superuser</button></a>
+		<a href="{% url ebanking_payment %}"><button class="minimal">Upload XML</button></a>
+    {% endif %}
+{% endblock %}
+    </div>
+		<div id="username">Dobrodošli, <i>{{ request.user.username }}</i></div>
+</div>
+
 {% block content %}
 {% endblock %}
+  <br><br>
+
+</div>
+<div id="bottom-container-960"></div>
 <div id="footer">&copy; 2012. Fer2net</div>
 </body>
 </html>

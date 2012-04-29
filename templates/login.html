@@ -1,10 +1,41 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html>
+<head>
 
-{% block title-extra %} / Prijava {% endblock %}
+  <title>Fer2net članarine</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 
-{% block content %}
+  <link href="{% url templates "reset.css" %}" rel="stylesheet" type="text/css">
+  <link href="{% url templates "style.css" %}" rel="stylesheet" type="text/css">
+</head>
 
-<div id="iznadprijave"><div id="strelica"></div></div>
+<body>
+
+{% if msg_info %}
+  <div class="info">{{ msg_info|safe }}</div>
+{% endif %}
+
+{% if msg_warning %}
+  <div class="warning">{{ msg_warning }}</div>
+{% endif %}
+
+{% if msg_success %}
+  <div class="success">{{ msg_success }}</div>
+{% endif %}
+
+{% if msg_error %}
+  <div class="error">{{ msg_error }}</div>
+{% endif %}
+
+<div id="iznadprijave">
+<div id="group-img">
+<img src="{% url images "prijava.png" %}" border="0" />
+</div>
+<div id="strelica">
+<img src="{% url images "strelica.png" %}" border="0" />
+</div>
+</div>
+
 <div id="prijava-top"></div>
 
 <div id="prijava">
@@ -41,5 +72,7 @@
 </div>
 
 <div id="prijava-bottom"></div>
-{% endblock %}
 
+<div id="footer">&copy; 2012. Fer2net</div>
+</body>
+</html>
