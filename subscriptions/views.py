@@ -142,6 +142,9 @@ def superuserDeletePayment(request, sid=None):
       snewst = s.user.subscriptions.filter(valid=True).order_by('-subsEnd')[0]
       if snewst.id == s.id:
         deactOk = deactivateMember(s.user, s.oldGroupId)
+    else:
+      deactOk = True # deactivation skipped - invalid subscription!
+
   except Subscription.DoesNotExist:
     return HttpResponse("subscription with ID %d does not exist!" % (sid,), status=404)
 
