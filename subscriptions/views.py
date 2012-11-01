@@ -46,8 +46,8 @@ def indexSuperuser(request, msg_info=None):
   else:
     form = BillForm()
 
-  subs = Subscription.objects.order_by('-date').all()
-  bills = Bill.objects.order_by('-date').all()
+  subs = Subscription.objects.select_related().order_by('-date').all()[:]
+  bills = Bill.objects.order_by('-date').all()[:]
 
   return render_to_response('index-superuser.html', {'msg_info':msg_info, 'allSubs': subs, 'bill_form': form, 'allBills': bills, 'billTypes': Bill.BILL_TYPES_DICT, 'subs_period': settings.cfgSubsPeriod}, context_instance=RequestContext(request))
 
