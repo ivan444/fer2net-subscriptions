@@ -9,7 +9,6 @@ from subscriptions.models import Subscription, fetchUser, usergroupid
 paymaster = fetchUser(settings.cfgEBPaymasterId)
 
 def makePayment(uid, amount, ogid, pay_date):
-  # NAPOMENA: ne vodi se briga o posebnim grupama!
   intAmount = int(amount)
   user = fetchUser(uid)
   #oldGid = usergroupid(user)
